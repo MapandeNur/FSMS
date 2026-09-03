@@ -20,8 +20,22 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'phone',
         'password',
+        'is_active',
     ];
+
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class)
+            ->withPivot('start_date', 'end_date')
+            ->withTimestamps();
+    }
+    
+    public function createdStudents()
+    {
+        return $this->hasMany(Student::class, 'created_by');
+    }
 
     /**
      * The attributes that should be hidden for serialization.
