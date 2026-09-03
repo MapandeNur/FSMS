@@ -6,11 +6,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use laravel\sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -59,4 +60,26 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
-}
+
+    
+
+use App\Http\Controllers\AuthController;
+use Illuminate\Support\Facades\Route;
+
+Route::prefix('v1')->group(function () {
+
+    // Public route
+    Route::post('/auth/login', [AuthController::class, 'login'])
+        ->middleware('throttle:5,1');
+
+    // Protected routes
+    Route::middleware('auth:sanctum')->group(function () {
+
+        Route::post('/auth/logout', [AuthController::class, 'logout']);
+
+        Route::get('/auth/me', [AuthController::class, 'me']);
+
+    });
+
+});
+?>
