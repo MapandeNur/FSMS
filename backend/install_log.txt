@@ -1,0 +1,5 @@
+Installing dependencies from lock file (including require-dev)
+Verifying lock file contents can be installed on current platform.
+Package operations: 111 installs, 0 updates, 0 removals
+  - Downloading laravel/pint (v1.30.4)
+ 0/1 [>---------------------------]   0%Terminate batch job (Y/N)? Terminate batch job (Y/N)? Terminate batch job (Y/N)? Terminate batch job (Y/N)? Terminate batch job (Y/N)? Terminate batch job (Y/N)? 
