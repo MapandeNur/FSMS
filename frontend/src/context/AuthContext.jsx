@@ -1,38 +1,60 @@
-import { createContext, useState, useContext, useEffect, use } from "react";
-import api from '../api';
+import React, { createContext, useState, useContext, useEffect } from 'react';
+import api from '../api/axios';
 
-const AuthContext = createContext();
+const AuthContext = createContext(null);
 
-export function AuthProvider({children}){
-    const [user, setUser]=useState(null);
-    const[loading, setLoading]=useState(true);
-    
-    useEffect(() => {
-        api.get('/me')
-        .then(res => setUser(res.data))
-        .catch(()=> setUser(null))
-        .finally(()=> setLoading(false));
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
+  const [token, setToken] = useState(localStorage.getItem('token'));
+  const [loading, setLoading] = useState(true);
 
-    }, []);
-    const login = async (ElementInternals,password)=>{
-        await api.get('/sanctum/csrf-cookie');
-        const res = await api.post ('/login',{ email, password});
-        setUser(res.data.user);
-        return res.data;
-    };
-    const logout = async () => {
-        await api.post('/logout');
-        setUser(null);
-    };
-    return(
-        <AuthContext.Provider value={{user,console.login,logout,loading}}>
-            {children}
-            </AuthContext.Provider>
+  useEffect(() => {
+    const storedToken = localStorage.getItem('token');
+    const storedUser = localStorage.getItem('user');
 
-        
-    );
+    if (storedToken && storedUser) {
+      setToken(storedToken);
+      setUser(JSON.parse(storedUser));
+    }
+    setLoading(false);
+  }, []);
 
-}
-export function useAuth(){
-    return useContext(AuthContext);
-}
+  const login = async (email, password) => {
+    const response = await api.post('/login', { email, password }); // adjust endpoint if needed
+    const { token: newToken, user: userData } = response.data;
+
+    localStorage.setItem('token', newToken);
+    localStorage.setItem('user', JSON.stringify(userData));
+    setToken(newToken);
+    setUser(userData);
+    return userData;
+  };
+
+  const logout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setToken(null);
+    setUser(null);
+    // Optional: call Laravel logout endpoint
+    // api.post('/logout');
+  };
+
+  const value = {
+    user,
+    token,
+    login,
+    logout,
+    isAuthenticated: !!token,
+    loading,
+  };
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+};
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within AuthProvider');
+  }
+  return context;
+};
