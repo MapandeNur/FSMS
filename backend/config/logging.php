@@ -81,6 +81,7 @@ return [
 
             'username' => env('LOG_SLACK_USERNAME', 'Laravel Log'),
             'emoji' => env('LOG_SLACK_EMOJI', ':boom:'),
+        ],
 
         'papertrail' => [
             'driver' => 'monolog',
