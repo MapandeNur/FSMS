@@ -9,9 +9,6 @@ use Illuminate\Support\Str;
 
 /**
  * @extends Factory<User>
- */
-class UserFactory extends Factory
-{
     /**
      * The current password being used by the factory.
      */
