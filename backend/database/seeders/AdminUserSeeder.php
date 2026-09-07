@@ -10,9 +10,6 @@ class AdminUserSeeder extends Seeder
 {
     public function run(): void
     {
-        $this->call(
-            [AdminUserSeeder :: class]
-        );
         User::updateOrCreate(
             ['email' => 'admin@fsms.com'],
             [
