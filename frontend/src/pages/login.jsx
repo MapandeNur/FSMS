@@ -1,60 +1,149 @@
-import React, { useState } from 'react';
-import { Form, Input, Button, Card, message, Typography } from 'antd';
-import { UserOutlined, LockOutlined } from '@ant-design/icons';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-
-const { Title } = Typography;
-
-const Login = () => {
-  const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
-  const navigate = useNavigate();
-  const location = useLocation();
-
-  const from = location.state?.from?.pathname || '/dashboard';
-
-  const onFinish = async (values) => {
-    setLoading(true);
-    try {
-      await login(values.email, values.password);
-      message.success('Login successful');
-      navigate(from, { replace: true });
-    } catch (error) {
-      message.error(error.response?.data?.message || 'Login failed');
-    } finally {
-      setLoading(false);
-    }
-  };
-
+function Login() {
   return (
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', background: '#f0f2f5' }}>
-      <Card style={{ width: 400, boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
-        <Title level={3} style={{ textAlign: 'center', marginBottom: 24 }}>
+    <div
+      style={{
+        backgroundImage: "url('/logo.jpg')",
+        backgroundSize: "cover",
+        backgroundRepeat: "no-repeat",
+        backgroundPosition: "center",
+        backgroundColor: "#f0f4f8",
+        minHeight: "100vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        position: "relative",
+        fontFamily: "Segoe UI, Arial, sans-serif",
+      }}
+    >
+      {/* Light overlay so logo stays clear */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          backgroundColor: "rgba(255, 230, 80, 0.25)",
+          zIndex: 0,
+        }}
+      />
+
+      {/* Login Card */}
+      <div
+        style={{
+          position: "relative",
+          zIndex: 1,
+          backgroundColor: "yellow",
+          padding: "45px 40px",
+          borderRadius: "16px",
+          boxShadow: "0 15px 40px rgba(0, 0, 0, 0.18)",
+          width: "100%",
+          maxWidth: "420px",
+          textAlign: "center",
+        }}
+      >
+        <h2
+          style={{
+            margin: "0 0 8px 0",
+            color: "#1e293b",
+            fontSize: "24px",
+            fontWeight: "700",
+          }}
+        >
           Field Student Management
-        </Title>
-        <Form name="login" onFinish={onFinish} layout="vertical">
-          <Form.Item
-            name="email"
-            rules={[{ required: true, message: 'Please enter your email' }, { type: 'email' }]}
+        </h2>
+
+        <p
+          style={{
+            margin: "0 0 30px 0",
+            color: "#64748b",
+            fontSize: "14px",
+          }}
+        >
+          Sign in to continue
+        </p>
+
+        <form>
+          <div style={{ marginBottom: "20px", textAlign: "left" }}>
+            <label
+              style={{
+                display: "block",
+                marginBottom: "7px",
+                fontSize: "14px",
+                fontWeight: "500",
+                color: "#334155",
+              }}
+            >
+              Email
+            </label>
+            <input
+              type="email"
+              placeholder="Enter your email"
+              style={{
+                width: "100%",
+                padding: "13px 16px",
+                border: "1.5px solid #e2e8f0",
+                borderRadius: "10px",
+                fontSize: "15px",
+                outline: "none",
+                transition: "border-color 0.2s",
+                boxSizing: "border-box",
+              }}
+              onFocus={(e) => (e.target.style.borderColor = "#3b82f6")}
+              onBlur={(e) => (e.target.style.borderColor = "#e2e8f0")}
+            />
+          </div>
+
+          <div style={{ marginBottom: "28px", textAlign: "left" }}>
+            <label
+              style={{
+                display: "block",
+                marginBottom: "7px",
+                fontSize: "14px",
+                fontWeight: "500",
+                color: "#334155",
+              }}
+            >
+              Password
+            </label>
+            <input
+              type="password"
+              placeholder="Enter your password"
+              style={{
+                width: "100%",
+                padding: "13px 16px",
+                border: "1.5px solid #e2e8f0",
+                borderRadius: "10px",
+                fontSize: "15px",
+                outline: "none",
+                transition: "border-color 0.2s",
+                boxSizing: "border-box",
+              }}
+              onFocus={(e) => (e.target.style.borderColor = "#3b82f6")}
+              onBlur={(e) => (e.target.style.borderColor = "#e2e8f0")}
+            />
+          </div>
+
+          <button
+            type="submit"
+            style={{
+              width: "100%",
+              padding: "14px",
+              backgroundColor: "#2563eb",
+              color: "white",
+              border: "none",
+              borderRadius: "10px",
+              fontSize: "16px",
+              fontWeight: "600",
+              cursor: "pointer",
+              transition: "background-color 0.2s",
+            }}
+            onMouseOver={(e) => (e.target.style.backgroundColor = "#1d4ed8")}
+            onMouseOut={(e) => (e.target.style.backgroundColor = "#2563eb")}
           >
-            <Input prefix={<UserOutlined />} placeholder="Email" size="large" />
-          </Form.Item>
-          <Form.Item
-            name="password"
-            rules={[{ required: true, message: 'Please enter your password' }]}
-          >
-            <Input.Password prefix={<LockOutlined />} placeholder="Password" size="large" />
-          </Form.Item>
-          <Form.Item>
-            <Button type="primary" htmlType="submit" loading={loading} block size="large">
-              Log in
-            </Button>
-          </Form.Item>
-        </Form>
-      </Card>
+            Log in
+          </button>
+        </form>
+      </div>
     </div>
   );
-};
+}
 
 export default Login;
