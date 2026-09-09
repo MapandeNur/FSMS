@@ -15,26 +15,17 @@ return [
     */
 
     'postmark' => [
-<<<<<<< HEAD
         'token' => env('POSTMARK_TOKEN'),
-=======
-        'key' => env('POSTMARK_API_KEY'),
     ],
 
     'resend' => [
         'key' => env('RESEND_API_KEY'),
->>>>>>> 5d48079fd2491b555b2bd37ceedda945168a6850
     ],
 
     'ses' => [
         'key' => env('AWS_ACCESS_KEY_ID'),
         'secret' => env('AWS_SECRET_ACCESS_KEY'),
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
-    ],
-
-    'resend' => [
-        'key' => env('RESEND_KEY'),
-<<<<<<< HEAD
     ],
 
     'slack' => [
@@ -45,9 +36,3 @@ return [
     ],
 
 ];
-=======
-        ],
- 
-    ];
-
->>>>>>> 5d48079fd2491b555b2bd37ceedda945168a6850

@@ -65,11 +65,7 @@ return [
     |
     */
 
-<<<<<<< HEAD
     'timezone' => env('APP_TIMEZONE', 'UTC'),
-=======
-    'timezone' => 'UTC',
->>>>>>> 5d48079fd2491b555b2bd37ceedda945168a6850
 
     /*
     |--------------------------------------------------------------------------
@@ -105,11 +101,7 @@ return [
 
     'previous_keys' => [
         ...array_filter(
-<<<<<<< HEAD
             explode(',', env('APP_PREVIOUS_KEYS', ''))
-=======
-            explode(',', (string) env('APP_PREVIOUS_KEYS', ''))
->>>>>>> 5d48079fd2491b555b2bd37ceedda945168a6850
         ),
     ],
 

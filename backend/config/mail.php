@@ -46,11 +46,7 @@ return [
             'username' => env('MAIL_USERNAME'),
             'password' => env('MAIL_PASSWORD'),
             'timeout' => null,
-<<<<<<< HEAD
-            'local_domain' => env('MAIL_EHLO_DOMAIN', parse_url(env('APP_URL', 'http://localhost'), PHP_URL_HOST)),
-=======
             'local_domain' => env('MAIL_EHLO_DOMAIN', parse_url((string) env('APP_URL', 'http://localhost'), PHP_URL_HOST)),
->>>>>>> 5d48079fd2491b555b2bd37ceedda945168a6850
         ],
 
         'ses' => [
@@ -89,22 +85,16 @@ return [
                 'smtp',
                 'log',
             ],
-<<<<<<< HEAD
+            'retry_after' => 60,
         ],
 
         'roundrobin' => [
             'transport' => 'roundrobin',
-=======
-            'retry_after' => 60,
->>>>>>> 5d48079fd2491b555b2bd37ceedda945168a6850
             'mailers' => [
                 'ses',
                 'postmark',
             ],
-<<<<<<< HEAD
-=======
             'retry_after' => 60,
->>>>>>> 5d48079fd2491b555b2bd37ceedda945168a6850
         ],
 
     ],
@@ -122,11 +112,7 @@ return [
 
     'from' => [
         'address' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),
-<<<<<<< HEAD
-        'name' => env('MAIL_FROM_NAME', 'Example'),
-=======
         'name' => env('MAIL_FROM_NAME', env('APP_NAME', 'Laravel')),
->>>>>>> 5d48079fd2491b555b2bd37ceedda945168a6850
     ],
 
 ];

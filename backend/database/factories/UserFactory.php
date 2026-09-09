@@ -2,28 +2,17 @@
 
 namespace Database\Factories;
 
-<<<<<<< HEAD
-=======
 use App\Models\User;
->>>>>>> 5d48079fd2491b555b2bd37ceedda945168a6850
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 /**
-<<<<<<< HEAD
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
- */
-class UserFactory extends Factory
-{
-    /**
-=======
  * @extends Factory<User>
  */
 class UserFactory extends Factory
 {
-     /**
->>>>>>> 5d48079fd2491b555b2bd37ceedda945168a6850
+    /**
      * The current password being used by the factory.
      */
     protected static ?string $password;
@@ -54,7 +43,3 @@ class UserFactory extends Factory
         ]);
     }
 }
-<<<<<<< HEAD
-=======
-
->>>>>>> 5d48079fd2491b555b2bd37ceedda945168a6850
