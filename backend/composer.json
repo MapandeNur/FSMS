@@ -8,6 +8,18 @@
     "require": {
         "php": "^8.2",
         "laravel/framework": "^12.0",
+<<<<<<< HEAD
+        "laravel/tinker": "^2.9"
+    },
+    "require-dev": {
+        "fakerphp/faker": "^1.23",
+        "laravel/pail": "^1.1",
+        "laravel/pint": "^1.13",
+        "laravel/sail": "^1.26",
+        "mockery/mockery": "^1.6",
+        "nunomaduro/collision": "^8.1",
+        "phpunit/phpunit": "^11.0.1"
+=======
         "laravel/sanctum": "^4.3",
         "laravel/tinker": "^2.10.1"
     },
@@ -19,6 +31,7 @@
         "mockery/mockery": "^1.6",
         "nunomaduro/collision": "^8.6",
         "phpunit/phpunit": "^11.5.50"
+>>>>>>> 5d48079fd2491b555b2bd37ceedda945168a6850
     },
     "autoload": {
         "psr-4": {
@@ -33,6 +46,8 @@
         }
     },
     "scripts": {
+<<<<<<< HEAD
+=======
         "setup": [
             "composer install",
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\"",
@@ -49,6 +64,7 @@
             "@php artisan config:clear --ansi",
             "@php artisan test"
         ],
+>>>>>>> 5d48079fd2491b555b2bd37ceedda945168a6850
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
             "@php artisan package:discover --ansi"
@@ -64,8 +80,14 @@
             "@php -r \"file_exists('database/database.sqlite') || touch('database/database.sqlite');\"",
             "@php artisan migrate --graceful --ansi"
         ],
+<<<<<<< HEAD
+        "dev": [
+            "Composer\\Config::disableProcessTimeout",
+            "npx concurrently -c \"#93c5fd,#c4b5fd,#fb7185,#fdba74\" \"php artisan serve\" \"php artisan queue:listen --tries=1\" \"php artisan pail --timeout=0\" \"npm run dev\" --names=server,queue,logs,vite"
+=======
         "pre-package-uninstall": [
             "Illuminate\\Foundation\\ComposerScripts::prePackageUninstall"
+>>>>>>> 5d48079fd2491b555b2bd37ceedda945168a6850
         ]
     },
     "extra": {
@@ -80,6 +102,15 @@
         "allow-plugins": {
             "pestphp/pest-plugin": true,
             "php-http/discovery": true
+<<<<<<< HEAD
+        },
+        "policy": {
+            "advisories": {
+                "block": false,
+                "ignore-id": ["PKSA-m5cs-t1y6-qpcs", "PKSA-3r5d-mb8f-1qw9", "PKSA-mdq4-51ck-6kdq"]
+            }
+=======
+>>>>>>> 5d48079fd2491b555b2bd37ceedda945168a6850
         }
     },
     "minimum-stability": "stable",
