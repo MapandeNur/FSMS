@@ -1,149 +1,172 @@
-function Login() {
+import { useState } from "react";
+import { Form, Input, Button, message } from "antd";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import nssfLogo from "../assets/nssf-logo.png";
+
+const Login = () => {
+  const [loading, setLoading] = useState(false);
+  const { login } = useAuth();
+  const navigate = useNavigate();
+
+  const onFinish = async (values) => {
+    setLoading(true);
+    try {
+      await login(values.email, values.password);
+      message.success("Welcome again!");
+      navigate("/dashboard");
+    } catch (err) {
+      message.error("Login failed. Check email/password.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div
       style={{
-        backgroundImage: "url('/logo.jpg')",
-        backgroundSize: "cover",
-        backgroundRepeat: "no-repeat",
-        backgroundPosition: "center",
-        backgroundColor: "#f0f4f8",
         minHeight: "100vh",
+        background: "#6e1423",
+        backgroundImage:
+          "radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 1px)",
+        backgroundSize: "24px 24px",
         display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        position: "relative",
-        fontFamily: "Segoe UI, Arial, sans-serif",
+        flexDirection: "column",
       }}
     >
-      {/* Light overlay so logo stays clear */}
+      {/* Top bar */}
       <div
         style={{
-          position: "absolute",
-          inset: 0,
-          backgroundColor: "rgba(255, 230, 80, 0.25)",
-          zIndex: 0,
-        }}
-      />
-
-      {/* Login Card */}
-      <div
-        style={{
-          position: "relative",
-          zIndex: 1,
-          backgroundColor: "yellow",
-          padding: "45px 40px",
-          borderRadius: "16px",
-          boxShadow: "0 15px 40px rgba(0, 0, 0, 0.18)",
-          width: "100%",
-          maxWidth: "420px",
-          textAlign: "center",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          padding: "20px 32px",
+          color: "#f0e0c0",
         }}
       >
-        <h2
+        <span style={{ fontSize: 15, opacity: 0.85 }}>
+          Field Student Management System
+        </span>
+        <span
           style={{
-            margin: "0 0 8px 0",
-            color: "#1e293b",
-            fontSize: "24px",
-            fontWeight: "700",
+            border: "1px solid #f9b233",
+            color: "#f9b233",
+            borderRadius: 6,
+            padding: "4px 12px",
+            fontSize: 13,
           }}
         >
-          Field Student Management
-        </h2>
+          Production
+        </span>
+      </div>
 
-        <p
+      {/* Center card */}
+      <div
+        style={{
+          flex: 1,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <div
           style={{
-            margin: "0 0 30px 0",
-            color: "#64748b",
-            fontSize: "14px",
+            background: "#fff",
+            borderRadius: 10,
+            width: 420,
+            padding: "40px 40px 24px",
+            borderTop: "5px solid #f9b233",
+            boxShadow: "0 20px 60px rgba(0,0,0,0.35)",
           }}
         >
-          Sign in to continue
-        </p>
-
-        <form>
-          <div style={{ marginBottom: "20px", textAlign: "left" }}>
-            <label
+          <div style={{ textAlign: "center", marginBottom: 24 }}>
+            <img
+               src={nssfLogo}
+               alt="NSSF Logo"
+               style={{
+                width:100,
+                height:100,
+                objectFit:"contain",
+                display:"block",
+                margin:"0 auto 16px",
+               }}
+            />   
+            <h1
               style={{
-                display: "block",
-                marginBottom: "7px",
-                fontSize: "14px",
-                fontWeight: "500",
-                color: "#334155",
+                fontFamily: "Georgia, 'Times New Roman', serif",
+                fontSize: 30,
+                margin: 0,
+                color: "#222",
               }}
             >
-              Email
-            </label>
-            <input
-              type="email"
-              placeholder="Enter your email"
-              style={{
-                width: "100%",
-                padding: "13px 16px",
-                border: "1.5px solid #e2e8f0",
-                borderRadius: "10px",
-                fontSize: "15px",
-                outline: "none",
-                transition: "border-color 0.2s",
-                boxSizing: "border-box",
-              }}
-              onFocus={(e) => (e.target.style.borderColor = "#3b82f6")}
-              onBlur={(e) => (e.target.style.borderColor = "#e2e8f0")}
-            />
+              FSMS Portal
+            </h1>
+            <p style={{ color: "#777", marginTop: 8 }}>
+              Field placements & student records for NSSF Trainee.
+            </p>
           </div>
 
-          <div style={{ marginBottom: "28px", textAlign: "left" }}>
-            <label
+          <Form layout="vertical" onFinish={onFinish}>
+            <Form.Item
+              name="email"
+              label="Email"
+              rules={[{ required: true, message: "Email Required" }]}
+            >
+              <Input size="large" placeholder />
+            </Form.Item>
+            <Form.Item
+              name="password"
+              label="Password"
+              rules={[{ required: true, message: "Password Required" }]}
+            >
+              <Input.Password size="large" />
+            </Form.Item>
+            <Button
+              type="primary"
+              htmlType="submit"
+              loading={loading}
+              block
+              size="large"
               style={{
-                display: "block",
-                marginBottom: "7px",
-                fontSize: "14px",
-                fontWeight: "500",
-                color: "#334155",
+                background: "#f9b233",
+                borderColor: "#f9b233",
+                color: "#222",
+                fontWeight: 600,
               }}
             >
-              Password
-            </label>
-            <input
-              type="password"
-              placeholder="Enter your password"
-              style={{
-                width: "100%",
-                padding: "13px 16px",
-                border: "1.5px solid #e2e8f0",
-                borderRadius: "10px",
-                fontSize: "15px",
-                outline: "none",
-                transition: "border-color 0.2s",
-                boxSizing: "border-box",
-              }}
-              onFocus={(e) => (e.target.style.borderColor = "#3b82f6")}
-              onBlur={(e) => (e.target.style.borderColor = "#e2e8f0")}
-            />
-          </div>
+              Sign in
+            </Button>
+          </Form>
 
-          <button
-            type="submit"
+          <div
             style={{
-              width: "100%",
-              padding: "14px",
-              backgroundColor: "#2563eb",
-              color: "white",
-              border: "none",
-              borderRadius: "10px",
-              fontSize: "16px",
-              fontWeight: "600",
-              cursor: "pointer",
-              transition: "background-color 0.2s",
+              borderTop: "1px solid #eee",
+              marginTop: 24,
+              paddingTop: 16,
+              textAlign: "center",
+              color: "#999",
+              fontSize: 13,
             }}
-            onMouseOver={(e) => (e.target.style.backgroundColor = "#1d4ed8")}
-            onMouseOut={(e) => (e.target.style.backgroundColor = "#2563eb")}
           >
-            Log in
-          </button>
-        </form>
+            Access is limited to registered students and staff.
+          </div>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div
+        style={{
+          textAlign: "center",
+          color: "#e0c9a6",
+          fontSize: 13,
+          padding: "16px 0",
+          opacity: 0.8,
+        }}
+      >
+        Report a problem · System status · NSSF Computing Faculty, 2026
       </div>
     </div>
   );
-}
+};
 
 export default Login;
