@@ -86,4 +86,4 @@ const StudentTable = ({ students = [], onDelete }) => {
     );
 };
 
-export default StudentTabe;
+export default StudentTable;
