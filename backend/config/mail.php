@@ -86,6 +86,10 @@ return [
                 'log',
             ],
             'retry_after' => 60,
+        ],
+
+        'roundrobin' => [
+            'transport' => 'roundrobin',
             'mailers' => [
                 'ses',
                 'postmark',
