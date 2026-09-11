@@ -6,12 +6,22 @@ use Symfony\Component\Console\Input\ArgvInput;
 
 define('LARAVEL_START', microtime(true));
 
-// Register the Composer autoloader...
 require __DIR__.'/vendor/autoload.php';
 
-// Bootstrap Laravel and handle the command...
-/** @var Application $app */
-$app = require_once __DIR__.'/bootstrap/app.php';
+// Force a clean evaluation of the file instead of checking require_once cache
+$app = require __DIR__.'/bootstrap/app.php';
+
+// If an external package already globally initialized a container, grab it
+if ($app === 1 || !is_object($app)) {
+    if (class_exists(\Illuminate\Container\Container::class)) {
+        $app = \Illuminate\Container\Container::getInstance();
+    }
+}
+
+// Final absolute safety check before executing the command
+if (!is_object($app)) {
+    die("\n[ERROR] Unable to resolve the Laravel Application object.\n");
+}
 
 $status = $app->handleCommand(new ArgvInput);
 
