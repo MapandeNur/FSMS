@@ -1,7 +1,3 @@
-<<<<<<< Updated upstream
-import React from 'react';
-import { Typography, Card } from 'antd';
-=======
 import React from "react";
 import {
   Card,
@@ -17,21 +13,10 @@ import {
   FileDoneOutlined,
   ClockCircleOutlined,
 } from "@ant-design/icons";
->>>>>>> Stashed changes
 
-const { Title, Paragraph } = Typography;
+const { Title, Text } = Typography;
 
 const Dashboard = () => {
-<<<<<<< Updated upstream
-  return (
-    <Card>
-      <Title level={2}>Dashboard</Title>
-      <Paragraph>
-        Welcome to the Field Student Management System.  
-        This is a placeholder page. Other team members will add student lists, field placements, etc.
-      </Paragraph>
-    </Card>
-=======
   const stats = [
     {
       title: "Total Students",
@@ -165,7 +150,6 @@ const Dashboard = () => {
         </Text>
       </Card>
     </div>
->>>>>>> Stashed changes
   );
 };
 

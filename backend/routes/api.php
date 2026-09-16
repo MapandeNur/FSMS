@@ -12,9 +12,12 @@ Route::prefix('v1')->group(function () {
     |--------------------------------------------------------------------------
     */
 
-    // Public login route
-    Route::post('/auth/login', [AuthController::class, 'login'])
-        ->middleware('throttle:5,1');
+   // Public registration route
+Route::post('/auth/register', [AuthController::class, 'register']);
+
+// Public login route
+Route::post('/auth/login', [AuthController::class, 'login'])
+    ->middleware('throttle:5,1');
 
     /*
     |--------------------------------------------------------------------------
@@ -40,6 +43,8 @@ Route::prefix('v1')->group(function () {
 
             // User CRUD
             Route::apiResource('users', UserController::class);
+            Route::post('/users/{user}/roles', [UserController::class, 'assignRole']);
+Route::delete('/users/{user}/roles/{role}', [UserController::class, 'removeRole']);
 
         });
 

@@ -1,12 +1,4 @@
-<<<<<<< Updated upstream
-import React, { useState } from 'react';
-import { Form, Input, Button, Card, message, Typography } from 'antd';
-import { UserOutlined, LockOutlined } from '@ant-design/icons';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
 
-const { Title } = Typography;
-=======
 import React, { useState } from "react";
 import {
   Form,
@@ -21,10 +13,10 @@ import {
   UserAddOutlined,
   LoginOutlined,
 } from "@ant-design/icons";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import nssfLogo from "../assets/nssf-logo.png";
->>>>>>> Stashed changes
+import api from "../api/axios";
+
 
 const { Text } = Typography;
 
@@ -36,7 +28,7 @@ const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const from = location.state?.from?.pathname || '/dashboard';
+  const from = location.state?.from?.pathname || "/dashboard";
 
   // =========================
   // LOGIN
@@ -46,21 +38,21 @@ const Login = () => {
 
     try {
       await login(values.email, values.password);
-<<<<<<< Updated upstream
-      message.success('Login successful');
-      navigate(from, { replace: true });
-    } catch (error) {
-      message.error(error.response?.data?.message || 'Login failed');
-=======
 
       message.success("Welcome again!");
 
-      navigate("/dashboard");
+      navigate(from, { replace: true });
     } catch (error) {
       console.error("Login error:", error);
 
+      console.error(
+        "Login response:",
+        error.response?.data
+      );
+
       message.error(
-        "Login failed. Please check your email and password."
+        error.response?.data?.message ||
+          "Login failed. Please check your email and password."
       );
     } finally {
       setLoading(false);
@@ -71,61 +63,57 @@ const Login = () => {
   // REGISTRATION
   // =========================
   const onRegister = async (values) => {
-    setLoading(true);
+  setLoading(true);
 
-    try {
-      /*
-       * Registration API will be connected to Laravel later.
-       * For now this handles the frontend registration interface.
-       */
+  try {
+    const response = await api.post(
+      "/v1/auth/register",
+      {
+        name: values.name,
+        email: values.email,
+        phone: values.phone,
+        password: values.password,
+        password_confirmation: values.password_confirmation,
+      }
+    );
 
-      console.log("Registration data:", values);
+    console.log("REGISTRATION RESPONSE:", response.data);
 
-      message.success(
-        "Registration form submitted successfully."
-      );
+    message.success(
+      response.data?.message ||
+        "Registration successful. You can now login."
+    );
 
-      setShowRegister(false);
-    } catch (error) {
-      console.error("Registration error:", error);
+    setShowRegister(false);
+  } catch (error) {
+    console.error("REGISTRATION FAILED:", error);
+    console.error(
+      "Registration response:",
+      error.response?.data
+    );
+
+    const errors = error.response?.data?.errors;
+
+    if (errors) {
+      const firstError = Object.values(errors).flat()[0];
 
       message.error(
-        "Registration failed. Please try again."
+        firstError ||
+          error.response?.data?.message ||
+          "Registration failed."
       );
->>>>>>> Stashed changes
-    } finally {
-      setLoading(false);
+    } else {
+      message.error(
+        error.response?.data?.message ||
+          "Registration failed. Please try again."
+      );
     }
-  };
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
-<<<<<<< Updated upstream
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', background: '#f0f2f5' }}>
-      <Card style={{ width: 400, boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
-        <Title level={3} style={{ textAlign: 'center', marginBottom: 24 }}>
-          Field Student Management
-        </Title>
-        <Form name="login" onFinish={onFinish} layout="vertical">
-          <Form.Item
-            name="email"
-            rules={[{ required: true, message: 'Please enter your email' }, { type: 'email' }]}
-          >
-            <Input prefix={<UserOutlined />} placeholder="Email" size="large" />
-          </Form.Item>
-          <Form.Item
-            name="password"
-            rules={[{ required: true, message: 'Please enter your password' }]}
-          >
-            <Input.Password prefix={<LockOutlined />} placeholder="Password" size="large" />
-          </Form.Item>
-          <Form.Item>
-            <Button type="primary" htmlType="submit" loading={loading} block size="large">
-              Log in
-            </Button>
-          </Form.Item>
-        </Form>
-      </Card>
-=======
     <div
       style={{
         minHeight: "100vh",
@@ -204,17 +192,7 @@ const Login = () => {
               marginBottom: 24,
             }}
           >
-            <img
-              src={nssfLogo}
-              alt="NSSF Logo"
-              style={{
-                width: 90,
-                height: 90,
-                objectFit: "contain",
-                display: "block",
-                margin: "0 auto 14px",
-              }}
-            />
+           
 
             <h1
               style={{
@@ -225,7 +203,9 @@ const Login = () => {
                 color: "#222",
               }}
             >
-              {showRegister ? "Create Account" : "FSMS Portal"}
+              {showRegister
+                ? "Create Account"
+                : "FSMS Portal"}
             </h1>
 
             <p
@@ -538,9 +518,9 @@ const Login = () => {
         Report a problem · System status · NSSF Computing
         Faculty, 2026
       </div>
->>>>>>> Stashed changes
     </div>
   );
 };
 
 export default Login;
+
