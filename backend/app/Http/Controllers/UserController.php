@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\UserResource;
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -86,6 +87,67 @@ class UserController extends Controller
             'success' => true,
             'message' => 'User updated successfully.',
             'data' => new UserResource($user),
+        ]);
+    }
+
+    /**
+     * Assign a role to a user.
+     */
+    public function assignRole(Request $request, User $user)
+    {
+        $validated = $request->validate([
+            'role_id' => [
+                'required',
+                'integer',
+                'exists:roles,id',
+            ],
+            'start_date' => [
+                'nullable',
+                'date',
+            ],
+            'end_date' => [
+                'nullable',
+                'date',
+                'after_or_equal:start_date',
+            ],
+        ]);
+
+        $role = Role::findOrFail($validated['role_id']);
+
+        $user->roles()->syncWithoutDetaching([
+            $role->id => [
+                'start_date' => $validated['start_date'] ?? now()->toDateString(),
+                'end_date' => $validated['end_date'] ?? null,
+            ],
+        ]);
+
+        $user->load('roles');
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Role assigned successfully.',
+            'data' => [
+                'user' => new UserResource($user),
+                'role' => $role,
+            ],
+        ]);
+    }
+
+    /**
+     * Remove a role from a user.
+     */
+    public function removeRole(User $user, Role $role)
+    {
+        $user->roles()->detach($role->id);
+
+        $user->load('roles');
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Role removed successfully.',
+            'data' => [
+                'user' => new UserResource($user),
+            ],
         ]);
     }
 

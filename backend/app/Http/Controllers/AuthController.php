@@ -2,23 +2,24 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\UserResource;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules\Password;
 
 class AuthController extends Controller
 {
-    /** /
-     *create a new account
-      */
-    public function register(Request $request)
+    /**
+     * Register a new user.
+     */
+    public function register(Request $request): JsonResponse
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'unique:users,email'],
             'phone' => ['required', 'string', 'unique:users,phone'],
-            'password' => ['required', 'string', 'min:8'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
 
         $user = User::create([
@@ -31,15 +32,18 @@ class AuthController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Account created successfully.',
-            'data' => new UserResource($user),
+            'message' => 'Registration successful.',
+            'data' => [
+                'user' => $user,
+            ],
+            'errors' => null,
         ], 201);
     }
 
     /**
-     * Login user
+     * Login user and return Sanctum token.
      */
-    public function login(Request $request)
+    public function login(Request $request): JsonResponse
     {
         $credentials = $request->validate([
             'email' => ['required', 'email'],
@@ -48,22 +52,13 @@ class AuthController extends Controller
 
         $user = User::where('email', $credentials['email'])->first();
 
-        if (!$user) {
+        if (!$user || !Hash::check($credentials['password'], $user->password)) {
             return response()->json([
                 'success' => false,
-                'message' => 'User with this email does not exist.',
+                'message' => 'Invalid email or password.',
+                'data' => null,
                 'errors' => [
-                    'email' => ['Email not found.'],
-                ],
-            ], 401);
-        }
-
-        if (!Hash::check($credentials['password'], $user->password)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Invalid password.',
-                'errors' => [
-                    'password' => ['The password is incorrect.'],
+                    'email' => ['The provided credentials are incorrect.'],
                 ],
             ], 401);
         }
@@ -72,51 +67,55 @@ class AuthController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Your account is inactive.',
-                'errors' => [],
+                'data' => null,
+                'errors' => null,
             ], 403);
         }
 
-        $user->load('roles');
+        // Revoke old tokens before creating a new one.
+        $user->tokens()->delete();
 
-        $token = $user->createToken('FSMS-token')->plainTextToken;
+        $token = $user->createToken('fsms-api-token')->plainTextToken;
 
         return response()->json([
             'success' => true,
             'message' => 'Login successful.',
             'data' => [
-                'user' => new UserResource($user),
+                'user' => $user,
                 'token' => $token,
+                'token_type' => 'Bearer',
             ],
+            'errors' => null,
         ], 200);
     }
 
     /**
-     * Logout current user
+     * Logout authenticated user.
      */
-    public function logout(Request $request)
+    public function logout(Request $request): JsonResponse
     {
-        $request->user()->currentAccessToken()->delete();
+        $request->user()->currentAccessToken()?->delete();
 
         return response()->json([
             'success' => true,
             'message' => 'Logout successful.',
-            'data' => [],
+            'data' => null,
+            'errors' => null,
         ], 200);
     }
 
     /**
-     * Get authenticated user
+     * Return authenticated user.
      */
-    public function me(Request $request)
+    public function me(Request $request): JsonResponse
     {
-        $user = $request->user()->load('roles');
-
         return response()->json([
             'success' => true,
-            'message' => 'User details retrieved successfully.',
+            'message' => 'Authenticated user.',
             'data' => [
-                'user' => new UserResource($user),
+                'user' => $request->user(),
             ],
+            'errors' => null,
         ], 200);
     }
 }
