@@ -7,10 +7,19 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Role extends Model
 {
-    protected $fillable = ['name'];
+    protected $fillable = [
+        'name',
+        'description',
+    ];
 
+    /**
+     * The users that belong to the role.
+     */
     public function users(): BelongsToMany
     {
-        return $this->belongsToMany(User::class);
+        return $this->belongsToMany(User::class, 'role_user')
+            ->withPivot('start_date', 'end_date')
+            ->withTimestamps();
     }
 }
+

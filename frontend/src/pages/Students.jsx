@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Button,
   Card,
@@ -10,6 +10,7 @@ import {
   Table,
   Tag,
   Typography,
+  message,
 } from "antd";
 import {
   PlusOutlined,
@@ -19,85 +20,127 @@ import {
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 
+import api from "../api/axios";
+
 const { Title, Text } = Typography;
 
 const Students = () => {
   const navigate = useNavigate();
+
+  const [students, setStudents] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const [searchText, setSearchText] = useState("");
   const [genderFilter, setGenderFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
   const [institutionFilter, setInstitutionFilter] = useState("all");
 
-  // Temporary sample data
-  const students = [
-    {
-      key: "1",
-      registration_number: "FS/2026/0001",
-      name: "Huseini Miraji Hemedi",
-      gender: "Male",
-      institution: "University of Dar es Salaam",
-      programme: "Information Technology",
-      year: "Year 2",
-      status: "Active",
-    },
-    {
-      key: "2",
-      registration_number: "FS/2026/0002",
-      name: "Amina Hassan",
-      gender: "Female",
-      institution: "Ardhi University",
-      programme: "Computer Science",
-      year: "Year 3",
-      status: "Active",
-    },
-    {
-      key: "3",
-      registration_number: "FS/2026/0003",
-      name: "John Mgosi Manyuki",
-      gender: "Male",
-      institution: "University of Dodoma",
-      programme: "Information Technology",
-      year: "Year 2",
-      status: "Completed",
-    },
-    {
-      key: "4",
-      registration_number: "FS/2026/0004",
-      name: "Rebeka Mapande",
-      gender: "Female",
-      institution: "Mzumbe University",
-      programme: "Business Information Systems",
-      year: "Year 3",
-      status: "Pending",
-    },
-  ];
+  // =========================
+  // FETCH STUDENTS FROM API
+  // =========================
+  const fetchStudents = async () => {
+    setLoading(true);
 
-  // Get unique institutions
-  const institutions = [
-    ...new Set(students.map((student) => student.institution)),
-  ];
+    try {
+      const response = await api.get("/v1/students");
 
-  // Apply filters
+      const data = response.data?.data || [];
+
+      setStudents(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error("Failed to fetch students:", error);
+
+      message.error(
+        error.response?.data?.message ||
+          "Failed to load students."
+      );
+
+      setStudents([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Load students when page opens
+  useEffect(() => {
+    fetchStudents();
+  }, []);
+
+  // =========================
+  // PREPARE STUDENT DATA
+  // =========================
+  const formattedStudents = useMemo(() => {
+    return students.map((student) => ({
+      ...student,
+
+      key: student.id,
+
+      name: [
+        student.first_name,
+        student.middle_name,
+        student.last_name,
+      ]
+        .filter(Boolean)
+        .join(" "),
+
+      institution: student.institution_name,
+
+      programme: student.programme_of_study,
+
+      year: `Year ${student.year_of_study}`,
+
+      displayStatus:
+        student.status?.charAt(0).toUpperCase() +
+          student.status?.slice(1) || "Unknown",
+    }));
+  }, [students]);
+
+  // =========================
+  // GET UNIQUE INSTITUTIONS
+  // =========================
+  const institutions = useMemo(() => {
+    return [
+      ...new Set(
+        formattedStudents
+          .map((student) => student.institution)
+          .filter(Boolean)
+      ),
+    ];
+  }, [formattedStudents]);
+
+  // =========================
+  // FILTER STUDENTS
+  // =========================
   const filteredStudents = useMemo(() => {
-    return students.filter((student) => {
-      const search = searchText.toLowerCase().trim();
+    return formattedStudents.filter((student) => {
+      const search = searchText
+        .toLowerCase()
+        .trim();
+
+      const name =
+        student.name?.toLowerCase() || "";
+
+      const registrationNumber =
+        student.registration_number
+          ?.toLowerCase() || "";
+
+      const institution =
+        student.institution
+          ?.toLowerCase() || "";
 
       const matchesSearch =
-        student.name.toLowerCase().includes(search) ||
-        student.registration_number
-          .toLowerCase()
-          .includes(search) ||
-        student.institution.toLowerCase().includes(search);
+        name.includes(search) ||
+        registrationNumber.includes(search) ||
+        institution.includes(search);
 
       const matchesGender =
         genderFilter === "all" ||
-        student.gender.toLowerCase() ===
+        student.gender?.toLowerCase() ===
           genderFilter.toLowerCase();
 
       const matchesStatus =
         statusFilter === "all" ||
-        student.status.toLowerCase() ===
+        student.status?.toLowerCase() ===
           statusFilter.toLowerCase();
 
       const matchesInstitution =
@@ -112,13 +155,16 @@ const Students = () => {
       );
     });
   }, [
+    formattedStudents,
     searchText,
     genderFilter,
     statusFilter,
     institutionFilter,
   ]);
 
-  // Reset filters
+  // =========================
+  // RESET FILTERS
+  // =========================
   const handleReset = () => {
     setSearchText("");
     setGenderFilter("all");
@@ -126,69 +172,100 @@ const Students = () => {
     setInstitutionFilter("all");
   };
 
+  // =========================
+  // STATUS TAG
+  // =========================
+  const renderStatus = (status) => {
+    const normalizedStatus =
+      status?.toLowerCase();
+
+    let color = "default";
+
+    if (normalizedStatus === "active") {
+      color = "green";
+    } else if (normalizedStatus === "pending") {
+      color = "orange";
+    } else if (normalizedStatus === "completed") {
+      color = "blue";
+    } else if (normalizedStatus === "inactive") {
+      color = "red";
+    }
+
+    return (
+      <Tag color={color}>
+        {status || "Unknown"}
+      </Tag>
+    );
+  };
+
+  // =========================
+  // TABLE COLUMNS
+  // =========================
   const columns = [
     {
       title: "Registration No.",
       dataIndex: "registration_number",
       key: "registration_number",
       render: (value) => (
-        <Text strong style={{ color: "#6e1423" }}>
+        <Text
+          strong
+          style={{
+            color: "#6e1423",
+          }}
+        >
           {value}
         </Text>
       ),
     },
+
     {
       title: "Student Name",
       dataIndex: "name",
       key: "name",
     },
+
     {
       title: "Gender",
       dataIndex: "gender",
       key: "gender",
     },
+
     {
       title: "Institution",
       dataIndex: "institution",
       key: "institution",
     },
+
     {
       title: "Programme",
       dataIndex: "programme",
       key: "programme",
     },
+
     {
       title: "Year",
       dataIndex: "year",
       key: "year",
     },
+
     {
       title: "Status",
-      dataIndex: "status",
+      dataIndex: "displayStatus",
       key: "status",
-      render: (status) => {
-        let color = "default";
-
-        if (status === "Active") {
-          color = "green";
-        } else if (status === "Pending") {
-          color = "orange";
-        } else if (status === "Completed") {
-          color = "blue";
-        }
-
-        return <Tag color={color}>{status}</Tag>;
-      },
+      render: (status) =>
+        renderStatus(status),
     },
+
     {
       title: "Action",
       key: "action",
+      fixed: "right",
       render: (_, record) => (
         <Button
           type="link"
           icon={<EyeOutlined />}
           onClick={() =>
-            navigate(`/students/${record.key}`)
+            navigate(`/students/${record.id}`)
           }
         >
           View
@@ -199,11 +276,15 @@ const Students = () => {
 
   return (
     <div>
-      {/* PAGE HEADER */}
+      {/* =========================
+          PAGE HEADER
+      ========================= */}
       <Row
         justify="space-between"
         align="middle"
-        style={{ marginBottom: 24 }}
+        style={{
+          marginBottom: 24,
+        }}
       >
         <Col>
           <Title
@@ -222,25 +303,37 @@ const Students = () => {
         </Col>
 
         <Col>
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={() =>
-              navigate("/students/register")
-            }
-            style={{
-              background: "#6e1423",
-              borderColor: "#6e1423",
-              height: 42,
-              borderRadius: 8,
-            }}
-          >
-            Register Student
-          </Button>
+          <Space>
+            <Button
+              icon={<ReloadOutlined />}
+              onClick={fetchStudents}
+              loading={loading}
+            >
+              Refresh
+            </Button>
+
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={() =>
+                navigate("/students/register")
+              }
+              style={{
+                background: "#6e1423",
+                borderColor: "#6e1423",
+                height: 42,
+                borderRadius: 8,
+              }}
+            >
+              Register Student
+            </Button>
+          </Space>
         </Col>
       </Row>
 
-      {/* SEARCH & FILTERS */}
+      {/* =========================
+          SEARCH & FILTERS
+      ========================= */}
       <Card
         bordered={false}
         style={{
@@ -254,7 +347,7 @@ const Students = () => {
             <Input
               size="large"
               prefix={<SearchOutlined />}
-              placeholder="Search student, registration number..."
+              placeholder="Search name, registration number..."
               value={searchText}
               onChange={(e) =>
                 setSearchText(e.target.value)
@@ -267,7 +360,9 @@ const Students = () => {
           <Col xs={24} sm={12} lg={4}>
             <Select
               size="large"
-              style={{ width: "100%" }}
+              style={{
+                width: "100%",
+              }}
               value={genderFilter}
               onChange={setGenderFilter}
               options={[
@@ -291,7 +386,9 @@ const Students = () => {
           <Col xs={24} sm={12} lg={4}>
             <Select
               size="large"
-              style={{ width: "100%" }}
+              style={{
+                width: "100%",
+              }}
               value={statusFilter}
               onChange={setStatusFilter}
               options={[
@@ -311,6 +408,10 @@ const Students = () => {
                   value: "completed",
                   label: "Completed",
                 },
+                {
+                  value: "inactive",
+                  label: "Inactive",
+                },
               ]}
             />
           </Col>
@@ -319,7 +420,9 @@ const Students = () => {
           <Col xs={24} sm={12} lg={5}>
             <Select
               size="large"
-              style={{ width: "100%" }}
+              style={{
+                width: "100%",
+              }}
               value={institutionFilter}
               onChange={setInstitutionFilter}
               placeholder="Institution"
@@ -328,10 +431,13 @@ const Students = () => {
                   value: "all",
                   label: "All Institutions",
                 },
-                ...institutions.map((institution) => ({
-                  value: institution,
-                  label: institution,
-                })),
+
+                ...institutions.map(
+                  (institution) => ({
+                    value: institution,
+                    label: institution,
+                  })
+                ),
               ]}
             />
           </Col>
@@ -352,17 +458,29 @@ const Students = () => {
         </Row>
       </Card>
 
-      {/* RESULT COUNT */}
-      <div style={{ marginBottom: 12 }}>
+      {/* =========================
+          RESULT COUNT
+      ========================= */}
+      <div
+        style={{
+          marginBottom: 12,
+        }}
+      >
         <Text type="secondary">
           Showing{" "}
-          <strong>{filteredStudents.length}</strong>{" "}
+          <strong>
+            {filteredStudents.length}
+          </strong>{" "}
           student
-          {filteredStudents.length !== 1 ? "s" : ""}
+          {filteredStudents.length !== 1
+            ? "s"
+            : ""}
         </Text>
       </div>
 
-      {/* TABLE */}
+      {/* =========================
+          STUDENTS TABLE
+      ========================= */}
       <Card
         bordered={false}
         style={{
@@ -372,10 +490,20 @@ const Students = () => {
         <Table
           columns={columns}
           dataSource={filteredStudents}
+          loading={loading}
+          rowKey="id"
           scroll={{ x: 1100 }}
           pagination={{
             pageSize: 10,
-            showSizeChanger: false,
+            showSizeChanger: true,
+            showTotal: (total, range) =>
+              `${range[0]}-${range[1]} of ${total} students`,
+          }}
+          locale={{
+            emptyText:
+              loading
+                ? "Loading students..."
+                : "No students found",
           }}
         />
       </Card>

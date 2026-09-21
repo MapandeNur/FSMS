@@ -1,4 +1,7 @@
-import React, { useState } from "react";
+
+import React, { useEffect, useState } from "react";
+import dayjs from "dayjs";
+
 import {
   Button,
   Card,
@@ -9,35 +12,127 @@ import {
   Row,
   Select,
   Space,
+  Spin,
   Typography,
   message,
 } from "antd";
+
 import {
   ArrowLeftOutlined,
   SaveOutlined,
 } from "@ant-design/icons";
-import { useNavigate } from "react-router-dom";
+
+import { useNavigate, useParams } from "react-router-dom";
 import api from "../api/axios";
 
 const { Title, Text } = Typography;
 
-const StudentRegistration = () => {
+const StudentEdit = () => {
   const navigate = useNavigate();
+  const { id } = useParams();
   const [form] = Form.useForm();
+
+  const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
-  // =========================
-  // SUBMIT STUDENT
-  // =========================
+  // =====================================================
+  // FETCH STUDENT
+  // =====================================================
+
+  useEffect(() => {
+    const fetchStudent = async () => {
+      setLoading(true);
+
+      try {
+        const response = await api.get(`/v1/students/${id}`);
+
+        const student = response.data?.data;
+
+        if (!student) {
+          throw new Error("Student data was not returned.");
+        }
+
+        form.setFieldsValue({
+          registration_number: student.registration_number,
+
+          first_name: student.first_name || "",
+
+          middle_name: student.middle_name || "",
+
+          last_name: student.last_name || "",
+
+          gender: student.gender || "",
+
+          date_of_birth: student.date_of_birth
+            ? dayjs(student.date_of_birth)
+            : null,
+
+          email: student.email || "",
+
+          phone: student.phone || "",
+
+          institution_name: student.institution_name || "",
+
+          programme_of_study:
+            student.programme_of_study || "",
+
+          year_of_study: student.year_of_study
+            ? Number(student.year_of_study)
+            : undefined,
+
+          start_date: student.start_date
+            ? dayjs(student.start_date)
+            : null,
+
+          end_date: student.end_date
+            ? dayjs(student.end_date)
+            : null,
+
+          status:
+            student.status?.toLowerCase() || "active",
+        });
+      } catch (error) {
+        console.error("EDIT STUDENT LOAD ERROR:", error);
+        console.error(
+          "STATUS:",
+          error.response?.status
+        );
+        console.error(
+          "RESPONSE:",
+          error.response?.data
+        );
+
+        message.error(
+          error.response?.data?.message ||
+            "Failed to load student."
+        );
+
+        navigate("/students");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (id) {
+      fetchStudent();
+    }
+  }, [id, form, navigate]);
+
+  // =====================================================
+  // SUBMIT UPDATE
+  // =====================================================
+
   const handleSubmit = async (values) => {
     setSubmitting(true);
 
     try {
       const payload = {
         first_name: values.first_name.trim(),
-        middle_name: values.middle_name
+
+        middle_name: values.middle_name?.trim()
           ? values.middle_name.trim()
           : null,
+
         last_name: values.last_name.trim(),
 
         gender: values.gender,
@@ -67,30 +162,35 @@ const StudentRegistration = () => {
         status: values.status,
       };
 
-      const response = await api.post(
-        "/v1/students",
+      const response = await api.put(
+        `/v1/students/${id}`,
         payload
       );
 
-      const student =
-        response.data?.data;
-
       message.success(
         response.data?.message ||
-          "Student registered successfully."
+          "Student updated successfully."
       );
 
-      form.resetFields();
-
-      // Go back to Students list
-      navigate("/students", {
-        state: {
-          registeredStudent: student,
-        },
-      });
+      navigate(`/students/${id}`);
     } catch (error) {
+      console.error(
+        "UPDATE STUDENT ERROR:",
+        error
+      );
+
       const responseData =
         error.response?.data;
+
+      console.error(
+        "STATUS:",
+        error.response?.status
+      );
+
+      console.error(
+        "RESPONSE:",
+        responseData
+      );
 
       // Laravel validation errors
       if (
@@ -115,7 +215,7 @@ const StudentRegistration = () => {
       } else {
         message.error(
           responseData?.message ||
-            "Failed to register student. Please try again."
+            "Failed to update student."
         );
       }
     } finally {
@@ -123,19 +223,17 @@ const StudentRegistration = () => {
     }
   };
 
-  // =========================
-  // DISABLE FUTURE DOB
-  // =========================
+  // =====================================================
+  // DATE VALIDATION
+  // =====================================================
+
   const disableFutureDates = (current) => {
-    return current && current.isAfter(
-      new Date(),
-      "day"
+    return (
+      current &&
+      current.isAfter(dayjs(), "day")
     );
   };
 
-  // =========================
-  // DISABLE END DATES
-  // =========================
   const disableEndDates = (current) => {
     const startDate =
       form.getFieldValue("start_date");
@@ -150,11 +248,33 @@ const StudentRegistration = () => {
     );
   };
 
+  // =====================================================
+  // LOADING
+  // =====================================================
+
+  if (loading) {
+    return (
+      <div
+        style={{
+          minHeight: 400,
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Spin size="large" />
+      </div>
+    );
+  }
+
+  // =====================================================
+  // PAGE
+  // =====================================================
+
   return (
     <div>
-      {/* =========================
-          HEADER
-      ========================= */}
+      {/* HEADER */}
+
       <div
         style={{
           display: "flex",
@@ -166,7 +286,7 @@ const StudentRegistration = () => {
           type="text"
           icon={<ArrowLeftOutlined />}
           onClick={() =>
-            navigate("/students")
+            navigate(`/students/${id}`)
           }
           style={{
             color: "#6e1423",
@@ -182,18 +302,17 @@ const StudentRegistration = () => {
               color: "#6e1423",
             }}
           >
-            Register Student
+            Edit Student
           </Title>
 
           <Text type="secondary">
-            Add a new field student to the system
+            Update student registration information
           </Text>
         </div>
       </div>
 
-      {/* =========================
-          FORM
-      ========================= */}
+      {/* FORM */}
+
       <Card
         bordered={false}
         style={{
@@ -207,9 +326,8 @@ const StudentRegistration = () => {
           autoComplete="off"
           scrollToFirstError
         >
-          {/* =========================
-              PERSONAL INFORMATION
-          ========================= */}
+          {/* PERSONAL INFORMATION */}
+
           <Title
             level={4}
             style={{
@@ -221,7 +339,22 @@ const StudentRegistration = () => {
           </Title>
 
           <Row gutter={[20, 0]}>
+            {/* REGISTRATION NUMBER */}
+
+            <Col xs={24} md={8}>
+              <Form.Item
+                label="Registration Number"
+                name="registration_number"
+              >
+                <Input
+                  size="large"
+                  disabled
+                />
+              </Form.Item>
+            </Col>
+
             {/* FIRST NAME */}
+
             <Col xs={24} md={8}>
               <Form.Item
                 label="First Name"
@@ -236,7 +369,7 @@ const StudentRegistration = () => {
                     pattern:
                       /^[A-Za-zÀ-ÿ'-]+(?:\s[A-Za-zÀ-ÿ'-]+)*$/,
                     message:
-                      "Name can only contain letters, hyphens and apostrophes",
+                      "Name can only contain letters, spaces, hyphens and apostrophes",
                   },
                   {
                     max: 50,
@@ -253,6 +386,7 @@ const StudentRegistration = () => {
             </Col>
 
             {/* MIDDLE NAME */}
+
             <Col xs={24} md={8}>
               <Form.Item
                 label="Middle Name"
@@ -262,7 +396,7 @@ const StudentRegistration = () => {
                     pattern:
                       /^[A-Za-zÀ-ÿ'-]+(?:\s[A-Za-zÀ-ÿ'-]+)*$/,
                     message:
-                      "Name can only contain letters, hyphens and apostrophes",
+                      "Name can only contain letters, spaces, hyphens and apostrophes",
                   },
                   {
                     max: 50,
@@ -279,6 +413,7 @@ const StudentRegistration = () => {
             </Col>
 
             {/* LAST NAME */}
+
             <Col xs={24} md={8}>
               <Form.Item
                 label="Last Name"
@@ -293,7 +428,7 @@ const StudentRegistration = () => {
                     pattern:
                       /^[A-Za-zÀ-ÿ'-]+(?:\s[A-Za-zÀ-ÿ'-]+)*$/,
                     message:
-                      "Name can only contain letters, hyphens and apostrophes",
+                      "Name can only contain letters, spaces, hyphens and apostrophes",
                   },
                   {
                     max: 50,
@@ -310,6 +445,7 @@ const StudentRegistration = () => {
             </Col>
 
             {/* GENDER */}
+
             <Col xs={24} md={8}>
               <Form.Item
                 label="Gender"
@@ -324,7 +460,6 @@ const StudentRegistration = () => {
               >
                 <Select
                   size="large"
-                  placeholder="Select gender"
                   options={[
                     {
                       value: "Male",
@@ -340,6 +475,7 @@ const StudentRegistration = () => {
             </Col>
 
             {/* DATE OF BIRTH */}
+
             <Col xs={24} md={8}>
               <Form.Item
                 label="Date of Birth"
@@ -357,31 +493,16 @@ const StudentRegistration = () => {
                   style={{
                     width: "100%",
                   }}
-                  placeholder="Select date of birth"
                   disabledDate={
                     disableFutureDates
                   }
                 />
               </Form.Item>
             </Col>
-
-            {/* REGISTRATION NUMBER */}
-            <Col xs={24} md={8}>
-              <Form.Item
-                label="Registration Number"
-              >
-                <Input
-                  size="large"
-                  value="Auto-generated by system"
-                  disabled
-                />
-              </Form.Item>
-            </Col>
           </Row>
 
-          {/* =========================
-              CONTACT INFORMATION
-          ========================= */}
+          {/* CONTACT INFORMATION */}
+
           <Title
             level={4}
             style={{
@@ -395,6 +516,7 @@ const StudentRegistration = () => {
 
           <Row gutter={[20, 0]}>
             {/* EMAIL */}
+
             <Col xs={24} md={12}>
               <Form.Item
                 label="Email"
@@ -420,6 +542,7 @@ const StudentRegistration = () => {
             </Col>
 
             {/* PHONE */}
+
             <Col xs={24} md={12}>
               <Form.Item
                 label="Phone"
@@ -446,9 +569,8 @@ const StudentRegistration = () => {
             </Col>
           </Row>
 
-          {/* =========================
-              ACADEMIC INFORMATION
-          ========================= */}
+          {/* ACADEMIC INFORMATION */}
+
           <Title
             level={4}
             style={{
@@ -462,6 +584,7 @@ const StudentRegistration = () => {
 
           <Row gutter={[20, 0]}>
             {/* INSTITUTION */}
+
             <Col xs={24} md={8}>
               <Form.Item
                 label="Institution"
@@ -487,6 +610,7 @@ const StudentRegistration = () => {
             </Col>
 
             {/* PROGRAMME */}
+
             <Col xs={24} md={8}>
               <Form.Item
                 label="Programme"
@@ -512,6 +636,7 @@ const StudentRegistration = () => {
             </Col>
 
             {/* YEAR */}
+
             <Col xs={24} md={8}>
               <Form.Item
                 label="Year of Study"
@@ -526,7 +651,6 @@ const StudentRegistration = () => {
               >
                 <Select
                   size="large"
-                  placeholder="Select year"
                   options={[
                     {
                       value: 1,
@@ -562,9 +686,8 @@ const StudentRegistration = () => {
             </Col>
           </Row>
 
-          {/* =========================
-              FIELD PLACEMENT
-          ========================= */}
+          {/* FIELD PLACEMENT */}
+
           <Title
             level={4}
             style={{
@@ -578,6 +701,7 @@ const StudentRegistration = () => {
 
           <Row gutter={[20, 0]}>
             {/* START DATE */}
+
             <Col xs={24} md={8}>
               <Form.Item
                 label="Start Date"
@@ -595,16 +719,12 @@ const StudentRegistration = () => {
                   style={{
                     width: "100%",
                   }}
-                  onChange={() => {
-                    form.validateFields([
-                      "end_date",
-                    ]);
-                  }}
                 />
               </Form.Item>
             </Col>
 
             {/* END DATE */}
+
             <Col xs={24} md={8}>
               <Form.Item
                 label="End Date"
@@ -628,6 +748,10 @@ const StudentRegistration = () => {
                       if (
                         !value ||
                         !startDate ||
+                        value.isSame(
+                          startDate,
+                          "day"
+                        ) ||
                         value.isAfter(
                           startDate,
                           "day"
@@ -638,7 +762,7 @@ const StudentRegistration = () => {
 
                       return Promise.reject(
                         new Error(
-                          "End date must be after start date"
+                          "End date must be on or after start date"
                         )
                       );
                     },
@@ -658,11 +782,11 @@ const StudentRegistration = () => {
             </Col>
 
             {/* STATUS */}
+
             <Col xs={24} md={8}>
               <Form.Item
                 label="Status"
                 name="status"
-                initialValue="active"
                 rules={[
                   {
                     required: true,
@@ -692,9 +816,8 @@ const StudentRegistration = () => {
             </Col>
           </Row>
 
-          {/* =========================
-              ACTIONS
-          ========================= */}
+          {/* ACTIONS */}
+
           <Form.Item
             style={{
               marginTop: 20,
@@ -705,7 +828,7 @@ const StudentRegistration = () => {
               <Button
                 size="large"
                 onClick={() =>
-                  navigate("/students")
+                  navigate(`/students/${id}`)
                 }
                 disabled={submitting}
               >
@@ -723,7 +846,7 @@ const StudentRegistration = () => {
                   borderColor: "#6e1423",
                 }}
               >
-                Register Student
+                Save Changes
               </Button>
             </Space>
           </Form.Item>
@@ -733,4 +856,5 @@ const StudentRegistration = () => {
   );
 };
 
-export default StudentRegistration;
+export default StudentEdit;
+
