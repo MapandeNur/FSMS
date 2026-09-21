@@ -1,5 +1,7 @@
+
 import React, { useEffect, useState } from "react";
 import dayjs from "dayjs";
+
 import {
   Button,
   Card,
@@ -14,10 +16,12 @@ import {
   Typography,
   message,
 } from "antd";
+
 import {
   ArrowLeftOutlined,
   SaveOutlined,
 } from "@ant-design/icons";
+
 import { useNavigate, useParams } from "react-router-dom";
 import api from "../api/axios";
 
@@ -31,69 +35,73 @@ const StudentEdit = () => {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
-  // =========================
+  // =====================================================
   // FETCH STUDENT
-  // =========================
+  // =====================================================
+
   useEffect(() => {
     const fetchStudent = async () => {
       setLoading(true);
 
       try {
-        const response = await api.get(
-          `/v1/students/${id}`
-        );
+        const response = await api.get(`/v1/students/${id}`);
 
         const student = response.data?.data;
 
         if (!student) {
-          throw new Error(
-            "Student data was not returned."
-          );
+          throw new Error("Student data was not returned.");
         }
 
         form.setFieldsValue({
-          registration_number:
-            student.registration_number,
+          registration_number: student.registration_number,
 
-          first_name: student.first_name,
+          first_name: student.first_name || "",
 
-          middle_name:
-            student.middle_name || "",
+          middle_name: student.middle_name || "",
 
-          last_name: student.last_name,
+          last_name: student.last_name || "",
 
-          gender: student.gender,
+          gender: student.gender || "",
 
           date_of_birth: student.date_of_birth
             ? dayjs(student.date_of_birth)
             : null,
 
-          email: student.email,
+          email: student.email || "",
 
-          phone: student.phone,
+          phone: student.phone || "",
 
-          institution_name:
-            student.institution_name,
+          institution_name: student.institution_name || "",
 
           programme_of_study:
-            student.programme_of_study,
+            student.programme_of_study || "",
 
-          year_of_study:
-            student.year_of_study,
+          year_of_study: student.year_of_study
+            ? Number(student.year_of_study)
+            : undefined,
 
           start_date: student.start_date
-            ? window.dayjs(student.start_date)
+            ? dayjs(student.start_date)
             : null,
 
           end_date: student.end_date
-            ? window.dayjs(student.end_date)
+            ? dayjs(student.end_date)
             : null,
 
           status:
-            student.status?.toLowerCase() ||
-            "active",
+            student.status?.toLowerCase() || "active",
         });
       } catch (error) {
+        console.error("EDIT STUDENT LOAD ERROR:", error);
+        console.error(
+          "STATUS:",
+          error.response?.status
+        );
+        console.error(
+          "RESPONSE:",
+          error.response?.data
+        );
+
         message.error(
           error.response?.data?.message ||
             "Failed to load student."
@@ -110,9 +118,10 @@ const StudentEdit = () => {
     }
   }, [id, form, navigate]);
 
-  // =========================
+  // =====================================================
   // SUBMIT UPDATE
-  // =========================
+  // =====================================================
+
   const handleSubmit = async (values) => {
     setSubmitting(true);
 
@@ -120,7 +129,7 @@ const StudentEdit = () => {
       const payload = {
         first_name: values.first_name.trim(),
 
-        middle_name: values.middle_name
+        middle_name: values.middle_name?.trim()
           ? values.middle_name.trim()
           : null,
 
@@ -129,9 +138,7 @@ const StudentEdit = () => {
         gender: values.gender,
 
         date_of_birth:
-          values.date_of_birth.format(
-            "YYYY-MM-DD"
-          ),
+          values.date_of_birth.format("YYYY-MM-DD"),
 
         email: values.email.trim(),
 
@@ -147,14 +154,10 @@ const StudentEdit = () => {
           Number(values.year_of_study),
 
         start_date:
-          values.start_date.format(
-            "YYYY-MM-DD"
-          ),
+          values.start_date.format("YYYY-MM-DD"),
 
         end_date:
-          values.end_date.format(
-            "YYYY-MM-DD"
-          ),
+          values.end_date.format("YYYY-MM-DD"),
 
         status: values.status,
       };
@@ -171,9 +174,25 @@ const StudentEdit = () => {
 
       navigate(`/students/${id}`);
     } catch (error) {
+      console.error(
+        "UPDATE STUDENT ERROR:",
+        error
+      );
+
       const responseData =
         error.response?.data;
 
+      console.error(
+        "STATUS:",
+        error.response?.status
+      );
+
+      console.error(
+        "RESPONSE:",
+        responseData
+      );
+
+      // Laravel validation errors
       if (
         error.response?.status === 422 &&
         responseData?.errors
@@ -204,16 +223,14 @@ const StudentEdit = () => {
     }
   };
 
-  // =========================
+  // =====================================================
   // DATE VALIDATION
-  // =========================
+  // =====================================================
+
   const disableFutureDates = (current) => {
     return (
       current &&
-      current.isAfter(
-        window.dayjs(),
-        "day"
-      )
+      current.isAfter(dayjs(), "day")
     );
   };
 
@@ -231,9 +248,10 @@ const StudentEdit = () => {
     );
   };
 
-  // =========================
+  // =====================================================
   // LOADING
-  // =========================
+  // =====================================================
+
   if (loading) {
     return (
       <div
@@ -249,12 +267,14 @@ const StudentEdit = () => {
     );
   }
 
-  // =========================
+  // =====================================================
   // PAGE
-  // =========================
+  // =====================================================
+
   return (
     <div>
       {/* HEADER */}
+
       <div
         style={{
           display: "flex",
@@ -292,6 +312,7 @@ const StudentEdit = () => {
       </div>
 
       {/* FORM */}
+
       <Card
         bordered={false}
         style={{
@@ -306,6 +327,7 @@ const StudentEdit = () => {
           scrollToFirstError
         >
           {/* PERSONAL INFORMATION */}
+
           <Title
             level={4}
             style={{
@@ -318,6 +340,7 @@ const StudentEdit = () => {
 
           <Row gutter={[20, 0]}>
             {/* REGISTRATION NUMBER */}
+
             <Col xs={24} md={8}>
               <Form.Item
                 label="Registration Number"
@@ -331,6 +354,7 @@ const StudentEdit = () => {
             </Col>
 
             {/* FIRST NAME */}
+
             <Col xs={24} md={8}>
               <Form.Item
                 label="First Name"
@@ -345,7 +369,7 @@ const StudentEdit = () => {
                     pattern:
                       /^[A-Za-zÀ-ÿ'-]+(?:\s[A-Za-zÀ-ÿ'-]+)*$/,
                     message:
-                      "Name can only contain letters, hyphens and apostrophes",
+                      "Name can only contain letters, spaces, hyphens and apostrophes",
                   },
                   {
                     max: 50,
@@ -362,6 +386,7 @@ const StudentEdit = () => {
             </Col>
 
             {/* MIDDLE NAME */}
+
             <Col xs={24} md={8}>
               <Form.Item
                 label="Middle Name"
@@ -371,7 +396,7 @@ const StudentEdit = () => {
                     pattern:
                       /^[A-Za-zÀ-ÿ'-]+(?:\s[A-Za-zÀ-ÿ'-]+)*$/,
                     message:
-                      "Name can only contain letters, hyphens and apostrophes",
+                      "Name can only contain letters, spaces, hyphens and apostrophes",
                   },
                   {
                     max: 50,
@@ -388,6 +413,7 @@ const StudentEdit = () => {
             </Col>
 
             {/* LAST NAME */}
+
             <Col xs={24} md={8}>
               <Form.Item
                 label="Last Name"
@@ -402,7 +428,7 @@ const StudentEdit = () => {
                     pattern:
                       /^[A-Za-zÀ-ÿ'-]+(?:\s[A-Za-zÀ-ÿ'-]+)*$/,
                     message:
-                      "Name can only contain letters, hyphens and apostrophes",
+                      "Name can only contain letters, spaces, hyphens and apostrophes",
                   },
                   {
                     max: 50,
@@ -419,6 +445,7 @@ const StudentEdit = () => {
             </Col>
 
             {/* GENDER */}
+
             <Col xs={24} md={8}>
               <Form.Item
                 label="Gender"
@@ -448,6 +475,7 @@ const StudentEdit = () => {
             </Col>
 
             {/* DATE OF BIRTH */}
+
             <Col xs={24} md={8}>
               <Form.Item
                 label="Date of Birth"
@@ -474,6 +502,7 @@ const StudentEdit = () => {
           </Row>
 
           {/* CONTACT INFORMATION */}
+
           <Title
             level={4}
             style={{
@@ -487,6 +516,7 @@ const StudentEdit = () => {
 
           <Row gutter={[20, 0]}>
             {/* EMAIL */}
+
             <Col xs={24} md={12}>
               <Form.Item
                 label="Email"
@@ -512,6 +542,7 @@ const StudentEdit = () => {
             </Col>
 
             {/* PHONE */}
+
             <Col xs={24} md={12}>
               <Form.Item
                 label="Phone"
@@ -539,6 +570,7 @@ const StudentEdit = () => {
           </Row>
 
           {/* ACADEMIC INFORMATION */}
+
           <Title
             level={4}
             style={{
@@ -552,6 +584,7 @@ const StudentEdit = () => {
 
           <Row gutter={[20, 0]}>
             {/* INSTITUTION */}
+
             <Col xs={24} md={8}>
               <Form.Item
                 label="Institution"
@@ -577,6 +610,7 @@ const StudentEdit = () => {
             </Col>
 
             {/* PROGRAMME */}
+
             <Col xs={24} md={8}>
               <Form.Item
                 label="Programme"
@@ -602,6 +636,7 @@ const StudentEdit = () => {
             </Col>
 
             {/* YEAR */}
+
             <Col xs={24} md={8}>
               <Form.Item
                 label="Year of Study"
@@ -652,6 +687,7 @@ const StudentEdit = () => {
           </Row>
 
           {/* FIELD PLACEMENT */}
+
           <Title
             level={4}
             style={{
@@ -665,6 +701,7 @@ const StudentEdit = () => {
 
           <Row gutter={[20, 0]}>
             {/* START DATE */}
+
             <Col xs={24} md={8}>
               <Form.Item
                 label="Start Date"
@@ -687,6 +724,7 @@ const StudentEdit = () => {
             </Col>
 
             {/* END DATE */}
+
             <Col xs={24} md={8}>
               <Form.Item
                 label="End Date"
@@ -710,6 +748,10 @@ const StudentEdit = () => {
                       if (
                         !value ||
                         !startDate ||
+                        value.isSame(
+                          startDate,
+                          "day"
+                        ) ||
                         value.isAfter(
                           startDate,
                           "day"
@@ -720,7 +762,7 @@ const StudentEdit = () => {
 
                       return Promise.reject(
                         new Error(
-                          "End date must be after start date"
+                          "End date must be on or after start date"
                         )
                       );
                     },
@@ -740,6 +782,7 @@ const StudentEdit = () => {
             </Col>
 
             {/* STATUS */}
+
             <Col xs={24} md={8}>
               <Form.Item
                 label="Status"
@@ -774,6 +817,7 @@ const StudentEdit = () => {
           </Row>
 
           {/* ACTIONS */}
+
           <Form.Item
             style={{
               marginTop: 20,
@@ -813,3 +857,4 @@ const StudentEdit = () => {
 };
 
 export default StudentEdit;
+

@@ -14,8 +14,8 @@ class UserResource extends JsonResource
             'name' => $this->name,
             'email' => $this->email,
             'phone' => $this->phone,
-            'password' =>$this->password,
             'is_active' => $this->is_active,
+
             'roles' => $this->whenLoaded('roles', function () {
                 return $this->roles->map(function ($role) {
                     return [
@@ -26,6 +26,7 @@ class UserResource extends JsonResource
                     ];
                 });
             }),
+
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];
