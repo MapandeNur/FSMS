@@ -1,18 +1,21 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Button,
   Card,
   Col,
   Descriptions,
   Row,
+  Spin,
   Tag,
   Typography,
+  message,
 } from "antd";
 import {
   ArrowLeftOutlined,
   EditOutlined,
 } from "@ant-design/icons";
 import { useNavigate, useParams } from "react-router-dom";
+import api from "../api/axios";
 
 const { Title, Text } = Typography;
 
@@ -20,80 +23,71 @@ const StudentDetails = () => {
   const navigate = useNavigate();
   const { id } = useParams();
 
-  // Temporary sample data
-  // Later this will come from the Laravel API
-  const students = {
-    1: {
-      registration_number: "FS/2026/0001",
-      first_name: "Huseini",
-      middle_name: "Miraji",
-      last_name: "Hemedi",
-      gender: "Male",
-      date_of_birth: "2004-05-15",
-      email: "huseini@example.com",
-      phone: "0712345678",
-      institution: "University of Dar es Salaam",
-      programme: "Information Technology",
-      year_of_study: "Year 2",
-      start_date: "2026-06-01",
-      end_date: "2026-09-30",
-      status: "Active",
-    },
+  const [student, setStudent] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-    2: {
-      registration_number: "FS/2026/0002",
-      first_name: "Amina",
-      middle_name: "Hassan",
-      last_name: "",
-      gender: "Female",
-      date_of_birth: "2003-08-20",
-      email: "amina@example.com",
-      phone: "0755123456",
-      institution: "Ardhi University",
-      programme: "Computer Science",
-      year_of_study: "Year 3",
-      start_date: "2026-06-01",
-      end_date: "2026-09-30",
-      status: "Active",
-    },
+  // =========================
+  // FETCH STUDENT FROM API
+  // =========================
+  useEffect(() => {
+    const fetchStudent = async () => {
+      setLoading(true);
 
-    3: {
-      registration_number: "FS/2026/0003",
-      first_name: "John",
-      middle_name: "Mgosi",
-      last_name: "Manyuki",
-      gender: "Male",
-      date_of_birth: "2004-02-10",
-      email: "john@example.com",
-      phone: "0788123456",
-      institution: "University of Dodoma",
-      programme: "Information Technology",
-      year_of_study: "Year 2",
-      start_date: "2026-06-01",
-      end_date: "2026-09-30",
-      status: "Completed",
-    },
+      try {
+        const response = await api.get(
+          `/v1/students/${id}`
+        );
 
-    4: {
-      registration_number: "FS/2026/0004",
-      first_name: "Rebeka",
-      middle_name: "Mapande",
-      last_name: "",
-      gender: "Female",
-      date_of_birth: "2003-11-25",
-      email: "rebeka@example.com",
-      phone: "0766123456",
-      institution: "Mzumbe University",
-      programme: "Business Information Systems",
-      year_of_study: "Year 3",
-      start_date: "2026-06-01",
-      end_date: "2026-09-30",
-      status: "Pending",
-    },
-  };
+        const data = response.data?.data;
 
-  const student = students[id];
+        if (!data) {
+          throw new Error("Student data was not returned.");
+        }
 
+        setStudent(data);
+      } catch (error) {
+        console.error(
+          "Failed to fetch student:",
+          error
+        );
+
+        message.error(
+          error.response?.data?.message ||
+            "Failed to load student details."
+        );
+
+        setStudent(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (id) {
+      fetchStudent();
+    }
+  }, [id]);
+
+  // =========================
+  // LOADING
+  // =========================
+  if (loading) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          minHeight: 400,
+        }}
+      >
+        <Spin size="large" />
+      </div>
+    );
+  }
+
+  // =========================
+  // STUDENT NOT FOUND
+  // =========================
   if (!student) {
     return (
       <div>
@@ -101,24 +95,41 @@ const StudentDetails = () => {
           type="text"
           icon={<ArrowLeftOutlined />}
           onClick={() => navigate("/students")}
-          style={{ color: "#6e1423", marginBottom: 20 }}
+          style={{
+            color: "#6e1423",
+            marginBottom: 20,
+          }}
         >
           Back to Students
         </Button>
 
-        <Card bordered={false} style={{ borderRadius: 14 }}>
-          <Title level={3} style={{ color: "#6e1423" }}>
+        <Card
+          bordered={false}
+          style={{
+            borderRadius: 14,
+          }}
+        >
+          <Title
+            level={3}
+            style={{
+              color: "#6e1423",
+            }}
+          >
             Student Not Found
           </Title>
 
           <Text type="secondary">
-            The student you are looking for does not exist.
+            The student you are looking for does not
+            exist or could not be loaded.
           </Text>
         </Card>
       </div>
     );
   }
 
+  // =========================
+  // STUDENT INFORMATION
+  // =========================
   const fullName = [
     student.first_name,
     student.middle_name,
@@ -127,30 +138,66 @@ const StudentDetails = () => {
     .filter(Boolean)
     .join(" ");
 
+  const institution =
+    student.institution_name || "-";
+
+  const programme =
+    student.programme_of_study || "-";
+
+  const yearOfStudy =
+    student.year_of_study
+      ? `Year ${student.year_of_study}`
+      : "-";
+
+  // =========================
+  // STATUS
+  // =========================
+  const normalizedStatus =
+    student.status?.toLowerCase();
+
   let statusColor = "default";
 
-  if (student.status === "Active") {
+  if (normalizedStatus === "active") {
     statusColor = "green";
-  } else if (student.status === "Pending") {
+  } else if (normalizedStatus === "pending") {
     statusColor = "orange";
-  } else if (student.status === "Completed") {
+  } else if (normalizedStatus === "completed") {
     statusColor = "blue";
+  } else if (normalizedStatus === "inactive") {
+    statusColor = "red";
   }
+
+  const displayStatus =
+    student.status
+      ? student.status.charAt(0).toUpperCase() +
+        student.status.slice(1)
+      : "Unknown";
 
   return (
     <div>
-      {/* Header */}
+      {/* =========================
+          HEADER
+      ========================= */}
       <Row
         justify="space-between"
         align="middle"
-        style={{ marginBottom: 24 }}
+        style={{
+          marginBottom: 24,
+        }}
       >
         <Col>
-          <div style={{ display: "flex", alignItems: "center" }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+            }}
+          >
             <Button
               type="text"
               icon={<ArrowLeftOutlined />}
-              onClick={() => navigate("/students")}
+              onClick={() =>
+                navigate("/students")
+              }
               style={{
                 color: "#6e1423",
                 marginRight: 10,
@@ -169,7 +216,8 @@ const StudentDetails = () => {
               </Title>
 
               <Text type="secondary">
-                View student registration and field placement information
+                View student registration and field
+                placement information
               </Text>
             </div>
           </div>
@@ -179,6 +227,9 @@ const StudentDetails = () => {
           <Button
             type="primary"
             icon={<EditOutlined />}
+            onClick={() =>
+              navigate(`/students/${student.id}/edit`)
+            }
             style={{
               background: "#6e1423",
               borderColor: "#6e1423",
@@ -190,7 +241,9 @@ const StudentDetails = () => {
         </Col>
       </Row>
 
-      {/* Student Summary */}
+      {/* =========================
+          STUDENT SUMMARY
+      ========================= */}
       <Card
         bordered={false}
         style={{
@@ -198,7 +251,10 @@ const StudentDetails = () => {
           marginBottom: 20,
         }}
       >
-        <Row gutter={[24, 24]} align="middle">
+        <Row
+          gutter={[24, 24]}
+          align="middle"
+        >
           <Col xs={24} md={4}>
             <div
               style={{
@@ -214,7 +270,9 @@ const StudentDetails = () => {
                 fontWeight: 700,
               }}
             >
-              {student.first_name.charAt(0)}
+              {student.first_name
+                ?.charAt(0)
+                .toUpperCase()}
             </div>
           </Col>
 
@@ -233,14 +291,22 @@ const StudentDetails = () => {
               {student.registration_number}
             </Text>
 
-            <div style={{ marginTop: 10 }}>
-              <Tag color={statusColor}>{student.status}</Tag>
+            <div
+              style={{
+                marginTop: 10,
+              }}
+            >
+              <Tag color={statusColor}>
+                {displayStatus}
+              </Tag>
             </div>
           </Col>
         </Row>
       </Card>
 
-      {/* Personal Information */}
+      {/* =========================
+          PERSONAL INFORMATION
+      ========================= */}
       <Card
         bordered={false}
         style={{
@@ -258,7 +324,14 @@ const StudentDetails = () => {
           Personal Information
         </Title>
 
-        <Descriptions bordered column={{ xs: 1, sm: 2, md: 2 }}>
+        <Descriptions
+          bordered
+          column={{
+            xs: 1,
+            sm: 2,
+            md: 2,
+          }}
+        >
           <Descriptions.Item label="Registration Number">
             {student.registration_number}
           </Descriptions.Item>
@@ -268,24 +341,30 @@ const StudentDetails = () => {
           </Descriptions.Item>
 
           <Descriptions.Item label="Gender">
-            {student.gender}
+            {student.gender || "-"}
           </Descriptions.Item>
 
           <Descriptions.Item label="Date of Birth">
-            {student.date_of_birth}
+            {student.date_of_birth
+              ? new Date(
+                  student.date_of_birth
+                ).toLocaleDateString()
+              : "-"}
           </Descriptions.Item>
 
           <Descriptions.Item label="Email">
-            {student.email}
+            {student.email || "-"}
           </Descriptions.Item>
 
           <Descriptions.Item label="Phone">
-            {student.phone}
+            {student.phone || "-"}
           </Descriptions.Item>
         </Descriptions>
       </Card>
 
-      {/* Academic Information */}
+      {/* =========================
+          ACADEMIC INFORMATION
+      ========================= */}
       <Card
         bordered={false}
         style={{
@@ -303,22 +382,31 @@ const StudentDetails = () => {
           Academic Information
         </Title>
 
-        <Descriptions bordered column={{ xs: 1, sm: 2, md: 2 }}>
+        <Descriptions
+          bordered
+          column={{
+            xs: 1,
+            sm: 2,
+            md: 2,
+          }}
+        >
           <Descriptions.Item label="Institution">
-            {student.institution}
+            {institution}
           </Descriptions.Item>
 
           <Descriptions.Item label="Programme">
-            {student.programme}
+            {programme}
           </Descriptions.Item>
 
           <Descriptions.Item label="Year of Study">
-            {student.year_of_study}
+            {yearOfStudy}
           </Descriptions.Item>
         </Descriptions>
       </Card>
 
-      {/* Field Placement */}
+      {/* =========================
+          FIELD PLACEMENT
+      ========================= */}
       <Card
         bordered={false}
         style={{
@@ -335,17 +423,34 @@ const StudentDetails = () => {
           Field Placement
         </Title>
 
-        <Descriptions bordered column={{ xs: 1, sm: 2, md: 2 }}>
+        <Descriptions
+          bordered
+          column={{
+            xs: 1,
+            sm: 2,
+            md: 2,
+          }}
+        >
           <Descriptions.Item label="Start Date">
-            {student.start_date}
+            {student.start_date
+              ? new Date(
+                  student.start_date
+                ).toLocaleDateString()
+              : "-"}
           </Descriptions.Item>
 
           <Descriptions.Item label="End Date">
-            {student.end_date}
+            {student.end_date
+              ? new Date(
+                  student.end_date
+                ).toLocaleDateString()
+              : "-"}
           </Descriptions.Item>
 
           <Descriptions.Item label="Status">
-            <Tag color={statusColor}>{student.status}</Tag>
+            <Tag color={statusColor}>
+              {displayStatus}
+            </Tag>
           </Descriptions.Item>
         </Descriptions>
       </Card>

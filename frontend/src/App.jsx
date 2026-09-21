@@ -15,6 +15,7 @@ import Dashboard from "./pages/Dashboard";
 import Students from "./pages/Students";
 import StudentRegistration from "./pages/StudentRegistration";
 import StudentDetails from "./pages/StudentDetails";
+import StudentEdit from "./pages/StudentEdit";
 
 const PlaceholderPage = ({ title, description }) => {
   return (
@@ -108,6 +109,10 @@ function App() {
               path="students/:id"
               element={<StudentDetails />}
             />
+            <Route
+  path="/students/:id/edit"
+  element={<StudentEdit />}
+/>
 
             {/* =========================
                 FIELD PLACEMENTS
