@@ -72,7 +72,9 @@ function App() {
               </ProtectedRoute>
             }
           >
-            {/* ROOT → DASHBOARD */}
+            {/* =========================
+                ROOT → DASHBOARD
+            ========================= */}
 
             <Route
               index
@@ -84,7 +86,10 @@ function App() {
               }
             />
 
-            {/* DASHBOARD */}
+            {/* =========================
+                DASHBOARD
+                All authenticated users
+            ========================= */}
 
             <Route
               path="dashboard"
@@ -93,94 +98,127 @@ function App() {
 
             {/* =========================
                 STUDENTS
+                ADMIN ONLY
             ========================= */}
 
             <Route
               path="students"
-              element={<Students />}
+              element={
+                <ProtectedRoute allowedRoles={["admin"]}>
+                  <Students />
+                </ProtectedRoute>
+              }
             />
 
             <Route
               path="students/register"
-              element={<StudentRegistration />}
+              element={
+                <ProtectedRoute allowedRoles={["admin"]}>
+                  <StudentRegistration />
+                </ProtectedRoute>
+              }
             />
 
             <Route
               path="students/:id"
-              element={<StudentDetails />}
+              element={
+                <ProtectedRoute allowedRoles={["admin"]}>
+                  <StudentDetails />
+                </ProtectedRoute>
+              }
             />
+
             <Route
-  path="/students/:id/edit"
-  element={<StudentEdit />}
-/>
+              path="students/:id/edit"
+              element={
+                <ProtectedRoute allowedRoles={["admin"]}>
+                  <StudentEdit />
+                </ProtectedRoute>
+              }
+            />
 
             {/* =========================
                 FIELD PLACEMENTS
+                ADMIN ONLY FOR NOW
             ========================= */}
 
             <Route
               path="placements"
               element={
-                <PlaceholderPage
-                  title="Field Placements"
-                  description="Field placement management module will be available here."
-                />
+                <ProtectedRoute allowedRoles={["admin"]}>
+                  <PlaceholderPage
+                    title="Field Placements"
+                    description="Field placement management module will be available here."
+                  />
+                </ProtectedRoute>
               }
             />
 
             {/* =========================
                 REPORTS
+                ADMIN ONLY FOR NOW
             ========================= */}
 
             <Route
               path="reports"
               element={
-                <PlaceholderPage
-                  title="Reports"
-                  description="Reports module will be available here."
-                />
+                <ProtectedRoute allowedRoles={["admin"]}>
+                  <PlaceholderPage
+                    title="Reports"
+                    description="Reports module will be available here."
+                  />
+                </ProtectedRoute>
               }
             />
 
             {/* =========================
                 USERS
+                ADMIN ONLY
             ========================= */}
 
             <Route
               path="users"
               element={
-                <PlaceholderPage
-                  title="Users"
-                  description="User management module will be available here."
-                />
+                <ProtectedRoute allowedRoles={["admin"]}>
+                  <PlaceholderPage
+                    title="Users"
+                    description="User management module will be available here."
+                  />
+                </ProtectedRoute>
               }
             />
 
             {/* =========================
                 ROLES
+                ADMIN ONLY
             ========================= */}
 
             <Route
               path="roles"
               element={
-                <PlaceholderPage
-                  title="Roles & Permissions"
-                  description="Roles and permissions module will be available here."
-                />
+                <ProtectedRoute allowedRoles={["admin"]}>
+                  <PlaceholderPage
+                    title="Roles & Permissions"
+                    description="Roles and permissions module will be available here."
+                  />
+                </ProtectedRoute>
               }
             />
 
             {/* =========================
                 SETTINGS
+                ADMIN ONLY
             ========================= */}
 
             <Route
               path="settings"
               element={
-                <PlaceholderPage
-                  title="Settings"
-                  description="System settings will be available here."
-                />
+                <ProtectedRoute allowedRoles={["admin"]}>
+                  <PlaceholderPage
+                    title="Settings"
+                    description="System settings will be available here."
+                  />
+                </ProtectedRoute>
               }
             />
           </Route>
@@ -206,4 +244,3 @@ function App() {
 }
 
 export default App;
-

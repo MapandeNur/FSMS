@@ -14,6 +14,7 @@ import {
 } from "@ant-design/icons";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import nssfLogo from "../../assets/nssf-logo.png";
 
 const { Sider, Content } = Layout;
 const { Text } = Typography;
@@ -26,14 +27,25 @@ const MainLayout = () => {
 
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
 
-  const handleLogout = () => {
-    logout();
+  const {
+    user,
+    userRole,
+    logout,
+  } = useAuth();
+
+  // =========================
+  // LOGOUT
+  // =========================
+  const handleLogout = async () => {
+    await logout();
     navigate("/login");
   };
 
-  const menuItems = [
+  // =========================
+  // ALL ADMIN MENU ITEMS
+  // =========================
+  const adminMenuItems = [
     {
       key: "/dashboard",
       icon: <DashboardOutlined />,
@@ -92,13 +104,41 @@ const MainLayout = () => {
     },
   ];
 
-  const handleMenuClick = ({ key }) => {
-    navigate(key);
+  // =========================
+  // NON-ADMIN MENU
+  // =========================
+  const userMenuItems = [
+    {
+      key: "/dashboard",
+      icon: <DashboardOutlined />,
+      label: "Dashboard",
+    },
+  ];
+
+  // =========================
+  // SELECT MENU BY ROLE
+  // =========================
+  const menuItems =
+    userRole === "admin"
+      ? adminMenuItems
+      : userMenuItems;
+
+  // =========================
+  // ROLE DISPLAY NAME
+  // =========================
+  const roleLabel = {
+    admin: "Administrator",
+    supervisor: "Supervisor",
+    hr_officer: "HR Officer",
+    student: "Student",
   };
 
   return (
     <Layout style={{ minHeight: "100vh" }}>
-      {/* SIDEBAR */}
+
+      {/* =========================
+          SIDEBAR
+      ========================= */}
       <Sider
         collapsed={collapsed}
         trigger={null}
@@ -111,70 +151,69 @@ const MainLayout = () => {
           top: 0,
           bottom: 0,
           zIndex: 1000,
-          boxShadow: "2px 0 10px rgba(0,0,0,0.08)",
+          boxShadow:
+            "2px 0 10px rgba(0,0,0,0.08)",
         }}
       >
-        {/* BRAND */}
-        <div
-          style={{
-            height: 70,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: collapsed ? "center" : "flex-start",
-            padding: collapsed ? 0 : "0 16px",
-          }}
-        >
-          <Avatar
-            size={38}
-            style={{
-              background: GOLD,
-              color: "#222",
-              fontWeight: 800,
-              flexShrink: 0,
-            }}
-          >
-            FS
-          </Avatar>
 
-          {!collapsed && (
-            <div style={{ marginLeft: 10, overflow: "hidden" }}>
-              <div
-                style={{
-                  color: "#fff",
-                  fontSize: 18,
-                  fontWeight: 700,
-                  lineHeight: 1.1,
-                }}
-              >
-                FSMS
-              </div>
-
-              <Text
-                style={{
-                  color: "#f0e0c0",
-                  fontSize: 10,
-                  whiteSpace: "nowrap",
-                }}
-              >
-                Field Student Management
-              </Text>
-            </div>
-          )}
-        </div>
+        {/* =========================
+            BRAND
+        ========================= */}
+     <div
+  style={{
+    height: 82,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: "10px 12px",
+  }}
+>
+ <img
+  src={nssfLogo}
+  alt="NSSF Logo"
+  style={{
+    width: collapsed ? 55 : 215,
+    height: collapsed ? 55 : 58,
+    objectFit: "contain",
+    transform: collapsed ? "scale(0.9)" : "scale(1.25)",
+    transition: "all 0.2s",
+  }}
+/>
+</div>
 
         <Divider
           style={{
-            borderColor: "rgba(255,255,255,0.18)",
+            borderColor:
+              "rgba(255,255,255,0.18)",
             margin: "0 0 8px",
           }}
         />
 
-        {/* NAVIGATION */}
+        {/* =========================
+            ROLE
+        ========================= */}
+        {!collapsed && (
+          <div
+            style={{
+              padding: "0 16px 10px",
+              color: "#f0e0c0",
+              fontSize: 11,
+              textTransform: "uppercase",
+              letterSpacing: 0.5,
+            }}
+          >
+            {roleLabel[userRole] || "User"}
+          </div>
+        )}
+
+        {/* =========================
+            NAVIGATION
+        ========================= */}
         <Menu
           mode="inline"
           selectedKeys={[location.pathname]}
           items={menuItems}
-          onClick={handleMenuClick}
+          onClick={({ key }) => navigate(key)}
           style={{
             background: "transparent",
             borderRight: 0,
@@ -182,15 +221,20 @@ const MainLayout = () => {
           theme="dark"
         />
 
-        {/* USER / LOGOUT */}
+        {/* =========================
+            USER / LOGOUT
+        ========================= */}
         <div
           style={{
             position: "absolute",
             bottom: 0,
             left: 0,
             right: 0,
-            borderTop: "1px solid rgba(255,255,255,0.15)",
-            padding: collapsed ? "12px 0" : "12px",
+            borderTop:
+              "1px solid rgba(255,255,255,0.15)",
+            padding: collapsed
+              ? "12px 0"
+              : "12px",
           }}
         >
           {!collapsed && (
@@ -265,20 +309,28 @@ const MainLayout = () => {
         </div>
       </Sider>
 
-      {/* MAIN AREA */}
+      {/* =========================
+          MAIN AREA
+      ========================= */}
       <Layout
         style={{
-          marginLeft: collapsed ? 72 : 220,
+          marginLeft: collapsed
+            ? 72
+            : 220,
           transition: "all 0.2s",
           minHeight: "100vh",
         }}
       >
-        {/* HEADER */}
+
+        {/* =========================
+            HEADER
+        ========================= */}
         <div
           style={{
             height: 64,
             background: "#fff",
-            borderBottom: "1px solid #eee",
+            borderBottom:
+              "1px solid #eee",
             display: "flex",
             alignItems: "center",
             padding: "0 22px",
@@ -288,7 +340,9 @@ const MainLayout = () => {
           }}
         >
           <div
-            onClick={() => setCollapsed(!collapsed)}
+            onClick={() =>
+              setCollapsed(!collapsed)
+            }
             style={{
               fontSize: 19,
               cursor: "pointer",
@@ -307,7 +361,8 @@ const MainLayout = () => {
           <div
             style={{
               marginLeft: 18,
-              borderLeft: `3px solid ${GOLD}`,
+              borderLeft:
+                `3px solid ${GOLD}`,
               paddingLeft: 12,
             }}
           >
@@ -323,12 +378,15 @@ const MainLayout = () => {
           </div>
         </div>
 
-        {/* PAGE CONTENT */}
+        {/* =========================
+            PAGE CONTENT
+        ========================= */}
         <Content
           style={{
             padding: 24,
             background: "#f8f5f2",
-            minHeight: "calc(100vh - 64px)",
+            minHeight:
+              "calc(100vh - 64px)",
           }}
         >
           <Outlet />
@@ -339,4 +397,3 @@ const MainLayout = () => {
 };
 
 export default MainLayout;
-

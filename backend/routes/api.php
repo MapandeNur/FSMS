@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\RoleController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
@@ -40,22 +41,18 @@ Route::prefix('v1')->group(function () {
         |--------------------------------------------------------------------------
         */
 
-        Route::middleware('role:admin')->group(function () {
+       Route::middleware('role:admin')->group(function () {
 
-            // User management
-            Route::apiResource('users', UserController::class);
+    Route::get('/roles', [RoleController::class, 'index']);
+    Route::patch('/users/{user}/status', [UserController::class, 'updateStatus']);
 
-            // Assign role to user
-            Route::post('/users/{user}/roles', [UserController::class, 'assignRole']);
+    Route::apiResource('users', UserController::class);
 
-            // Remove role from user
-            Route::delete('/users/{user}/roles/{role}', [UserController::class, 'removeRole']);
+    Route::post('/users/{user}/roles', [UserController::class, 'assignRole']);
+    Route::delete('/users/{user}/roles/{role}', [UserController::class, 'removeRole']);
 
-
-            // Student management
-            Route::apiResource('students', StudentController::class);
-
-        });
+    Route::apiResource('students', StudentController::class);
+});
 
     });
 
