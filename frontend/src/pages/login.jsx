@@ -146,18 +146,7 @@ const Login = () => {
           Field Student Management System
         </span>
 
-        <span
-          style={{
-            border: "1px solid #f9b233",
-            color: "#f9b233",
-            borderRadius: 6,
-            padding: "4px 12px",
-            fontSize: 13,
-            fontWeight: 500,
-          }}
-        >
-          Production
-        </span>
+    
       </div>
 
       {/* =========================
@@ -205,7 +194,7 @@ const Login = () => {
             >
               {showRegister
                 ? "Create Account"
-                : "FSMS Portal"}
+                : "Field Student Management System"}
             </h1>
 
             <p
@@ -515,8 +504,7 @@ const Login = () => {
           opacity: 0.8,
         }}
       >
-        Report a problem · System status · NSSF Computing
-        Faculty, 2026
+        
       </div>
     </div>
   );
