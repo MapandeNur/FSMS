@@ -77,7 +77,7 @@ const Login = () => {
       }
     );
 
-    console.log("REGISTRATION RESPONSE:", response.data);
+
 
     message.success(
       response.data?.message ||

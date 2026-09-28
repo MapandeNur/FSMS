@@ -86,9 +86,6 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
-  // =========================
-  // LOGIN
-  // =========================
   const login = async (email, password) => {
     try {
       const response = await api.post(
@@ -99,10 +96,7 @@ export const AuthProvider = ({ children }) => {
         }
       );
 
-      console.log(
-        "LOGIN RESPONSE:",
-        response.data
-      );
+     
 
       const responseData =
         response.data?.data ||
@@ -116,9 +110,7 @@ export const AuthProvider = ({ children }) => {
         responseData?.user ||
         responseData?.data?.user;
 
-      // =========================
-      // CHECK TOKEN
-      // =========================
+      
       if (!newToken) {
         console.error(
           "Login response does not contain a token:",
@@ -130,9 +122,6 @@ export const AuthProvider = ({ children }) => {
         );
       }
 
-      // =========================
-      // SAVE TOKEN
-      // =========================
       localStorage.setItem(
         "token",
         newToken
@@ -140,9 +129,7 @@ export const AuthProvider = ({ children }) => {
 
       setToken(newToken);
 
-      // =========================
-      // SAVE USER
-      // =========================
+   
       if (userData) {
         localStorage.setItem(
           "user",
@@ -151,18 +138,12 @@ export const AuthProvider = ({ children }) => {
 
         setUser(userData);
 
-        console.log(
-          "USER ROLE:",
-          getUserRole(userData)
-        );
+       
       } else {
         localStorage.removeItem("user");
         setUser(null);
       }
 
-      console.log(
-        "LOGIN SUCCESSFUL"
-      );
 
       return userData;
     } catch (error) {
@@ -175,9 +156,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // =========================
-  // LOGOUT
-  // =========================
+  
   const logout = async () => {
     try {
       if (token) {
@@ -199,14 +178,10 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // =========================
-  // ROLE
-  // =========================
+ 
   const userRole = getUserRole(user);
 
-  // =========================
-  // AUTH VALUE
-  // =========================
+  
   const value = {
     user,
     token,
@@ -240,9 +215,6 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-// =========================
-// USE AUTH HOOK
-// =========================
 export const useAuth = () => {
   const context =
     useContext(AuthContext);
