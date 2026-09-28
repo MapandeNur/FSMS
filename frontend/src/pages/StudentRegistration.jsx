@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+
 import {
   Button,
   Card,
@@ -12,10 +13,12 @@ import {
   Typography,
   message,
 } from "antd";
+
 import {
   ArrowLeftOutlined,
   SaveOutlined,
 } from "@ant-design/icons";
+
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
 
@@ -35,15 +38,20 @@ const StudentRegistration = () => {
     try {
       const payload = {
         first_name: values.first_name.trim(),
+
         middle_name: values.middle_name
           ? values.middle_name.trim()
           : null,
+
         last_name: values.last_name.trim(),
 
+        // IMPORTANT:
+        // Backend expects: male, female, other
         gender: values.gender,
 
-        date_of_birth:
-          values.date_of_birth.format("YYYY-MM-DD"),
+        date_of_birth: values.date_of_birth.format(
+          "YYYY-MM-DD"
+        ),
 
         email: values.email.trim(),
 
@@ -67,6 +75,8 @@ const StudentRegistration = () => {
         status: values.status,
       };
 
+      console.log("STUDENT PAYLOAD:", payload);
+
       const response = await api.post(
         "/v1/students",
         payload
@@ -82,13 +92,17 @@ const StudentRegistration = () => {
 
       form.resetFields();
 
-      // Go back to Students list
       navigate("/students", {
         state: {
           registeredStudent: student,
         },
       });
     } catch (error) {
+      console.error(
+        "STUDENT REGISTRATION ERROR:",
+        error
+      );
+
       const responseData =
         error.response?.data;
 
@@ -97,14 +111,15 @@ const StudentRegistration = () => {
         error.response?.status === 422 &&
         responseData?.errors
       ) {
-        const fieldErrors = Object.entries(
-          responseData.errors
-        ).map(([field, errors]) => ({
-          name: field,
-          errors: Array.isArray(errors)
-            ? errors
-            : [String(errors)],
-        }));
+        const fieldErrors =
+          Object.entries(
+            responseData.errors
+          ).map(([field, errors]) => ({
+            name: field,
+            errors: Array.isArray(errors)
+              ? errors
+              : [String(errors)],
+          }));
 
         form.setFields(fieldErrors);
 
@@ -127,9 +142,12 @@ const StudentRegistration = () => {
   // DISABLE FUTURE DOB
   // =========================
   const disableFutureDates = (current) => {
-    return current && current.isAfter(
-      new Date(),
-      "day"
+    return (
+      current &&
+      current.isAfter(
+        new Date(),
+        "day"
+      )
     );
   };
 
@@ -146,7 +164,10 @@ const StudentRegistration = () => {
 
     return (
       current &&
-      current.isBefore(startDate, "day")
+      current.isBefore(
+        startDate,
+        "day"
+      )
     );
   };
 
@@ -234,7 +255,7 @@ const StudentRegistration = () => {
                   },
                   {
                     pattern:
-                      /^[A-Za-zÀ-ÿ'-]+(?:\s[A-Za-zÀ-ÿ'-]+)*$/,
+                      /^[A-Za-zÀ-ÿ]+(?:['-][A-Za-zÀ-ÿ]+)*$/,
                     message:
                       "Name can only contain letters, hyphens and apostrophes",
                   },
@@ -260,7 +281,7 @@ const StudentRegistration = () => {
                 rules={[
                   {
                     pattern:
-                      /^[A-Za-zÀ-ÿ'-]+(?:\s[A-Za-zÀ-ÿ'-]+)*$/,
+                      /^[A-Za-zÀ-ÿ]+(?:['-][A-Za-zÀ-ÿ]+)*$/,
                     message:
                       "Name can only contain letters, hyphens and apostrophes",
                   },
@@ -291,7 +312,7 @@ const StudentRegistration = () => {
                   },
                   {
                     pattern:
-                      /^[A-Za-zÀ-ÿ'-]+(?:\s[A-Za-zÀ-ÿ'-]+)*$/,
+                      /^[A-Za-zÀ-ÿ]+(?:['-][A-Za-zÀ-ÿ]+)*$/,
                     message:
                       "Name can only contain letters, hyphens and apostrophes",
                   },
@@ -327,12 +348,16 @@ const StudentRegistration = () => {
                   placeholder="Select gender"
                   options={[
                     {
-                      value: "Male",
+                      value: "male",
                       label: "Male",
                     },
                     {
-                      value: "Female",
+                      value: "female",
                       label: "Female",
+                    },
+                    {
+                      value: "other",
+                      label: "Other",
                     },
                   ]}
                 />
@@ -657,39 +682,38 @@ const StudentRegistration = () => {
               </Form.Item>
             </Col>
 
-            {/* STATUS */}
-            <Col xs={24} md={8}>
-              <Form.Item
-                label="Status"
-                name="status"
-                initialValue="active"
-                rules={[
-                  {
-                    required: true,
-                    message:
-                      "Please select status",
-                  },
-                ]}
-              >
-                <Select
-                  size="large"
-                  options={[
-                    {
-                      value: "pending",
-                      label: "Pending",
-                    },
-                    {
-                      value: "active",
-                      label: "Active",
-                    },
-                    {
-                      value: "completed",
-                      label: "Completed",
-                    },
-                  ]}
-                />
-              </Form.Item>
-            </Col>
+{/* STATUS */}
+<Col xs={24} md={8}>
+  <Form.Item
+    label="Status"
+    name="status"
+    initialValue="active"
+    rules={[
+      {
+        required: true,
+        message: "Please select status",
+      },
+    ]}
+  >
+    <Select
+      size="large"
+      options={[
+        {
+          value: "active",
+          label: "Active",
+        },
+        {
+          value: "completed",
+          label: "Completed",
+        },
+        {
+          value: "inactive",
+          label: "Inactive",
+        },
+      ]}
+    />
+  </Form.Item>
+</Col>
           </Row>
 
           {/* =========================

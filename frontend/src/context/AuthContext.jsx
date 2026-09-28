@@ -11,18 +11,57 @@ const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+
   const [token, setToken] = useState(
     localStorage.getItem("token")
   );
+
   const [loading, setLoading] = useState(true);
+
+  // =========================
+  // GET USER ROLE
+  // =========================
+  const getUserRole = (userData) => {
+    if (!userData) {
+      return null;
+    }
+
+    /*
+     * Backend returns:
+     *
+     * roles: [
+     *   {
+     *     id: 1,
+     *     name: "admin"
+     *   }
+     * ]
+     */
+
+    if (
+      Array.isArray(userData.roles) &&
+      userData.roles.length > 0
+    ) {
+      return userData.roles[0]?.name || null;
+    }
+
+    /*
+     * Fallback in case backend later
+     * returns a single role field.
+     */
+
+    return userData.role?.name || userData.role || null;
+  };
 
   // =========================
   // CHECK SAVED LOGIN
   // =========================
   useEffect(() => {
     try {
-      const storedToken = localStorage.getItem("token");
-      const storedUser = localStorage.getItem("user");
+      const storedToken =
+        localStorage.getItem("token");
+
+      const storedUser =
+        localStorage.getItem("user");
 
       if (storedToken) {
         setToken(storedToken);
@@ -65,22 +104,9 @@ export const AuthProvider = ({ children }) => {
         response.data
       );
 
-      /*
-       * Backend response may be:
-       *
-       * {
-       *   success: true,
-       *   message: "...",
-       *   data: {
-       *      token: "...",
-       *      user: {...}
-       *   }
-       * }
-       *
-       * We therefore read response.data.data first.
-       */
-
-      const responseData = response.data?.data || response.data;
+      const responseData =
+        response.data?.data ||
+        response.data;
 
       const newToken =
         responseData?.token ||
@@ -124,6 +150,11 @@ export const AuthProvider = ({ children }) => {
         );
 
         setUser(userData);
+
+        console.log(
+          "USER ROLE:",
+          getUserRole(userData)
+        );
       } else {
         localStorage.removeItem("user");
         setUser(null);
@@ -131,16 +162,6 @@ export const AuthProvider = ({ children }) => {
 
       console.log(
         "LOGIN SUCCESSFUL"
-      );
-
-      console.log(
-        "TOKEN SAVED:",
-        newToken
-      );
-
-      console.log(
-        "USER SAVED:",
-        userData
       );
 
       return userData;
@@ -159,10 +180,6 @@ export const AuthProvider = ({ children }) => {
   // =========================
   const logout = async () => {
     try {
-      /*
-       * Call Laravel logout endpoint
-       * only if a token exists.
-       */
       if (token) {
         await api.post(
           "/v1/auth/logout"
@@ -183,6 +200,11 @@ export const AuthProvider = ({ children }) => {
   };
 
   // =========================
+  // ROLE
+  // =========================
+  const userRole = getUserRole(user);
+
+  // =========================
   // AUTH VALUE
   // =========================
   const value = {
@@ -190,6 +212,20 @@ export const AuthProvider = ({ children }) => {
     token,
     login,
     logout,
+
+    userRole,
+
+    isAdmin:
+      userRole === "admin",
+
+    isSupervisor:
+      userRole === "supervisor",
+
+    isHrOfficer:
+      userRole === "hr_officer",
+
+    isStudent:
+      userRole === "student",
 
     isAuthenticated:
       Boolean(token),
@@ -208,7 +244,8 @@ export const AuthProvider = ({ children }) => {
 // USE AUTH HOOK
 // =========================
 export const useAuth = () => {
-  const context = useContext(AuthContext);
+  const context =
+    useContext(AuthContext);
 
   if (!context) {
     throw new Error(

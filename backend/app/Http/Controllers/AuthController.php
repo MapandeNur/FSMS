@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rules\Password;
 
 class AuthController extends Controller
 {
@@ -34,7 +34,7 @@ class AuthController extends Controller
             'success' => true,
             'message' => 'Registration successful.',
             'data' => [
-                'user' => $user,
+                'user' => new UserResource($user),
             ],
             'errors' => null,
         ], 201);
@@ -50,15 +50,22 @@ class AuthController extends Controller
             'password' => ['required', 'string'],
         ]);
 
-        $user = User::where('email', $credentials['email'])->first();
+        $user = User::with('roles')
+            ->where('email', $credentials['email'])
+            ->first();
 
-        if (!$user || !Hash::check($credentials['password'], $user->password)) {
+        if (
+            !$user ||
+            !Hash::check($credentials['password'], $user->password)
+        ) {
             return response()->json([
                 'success' => false,
                 'message' => 'Invalid email or password.',
                 'data' => null,
                 'errors' => [
-                    'email' => ['The provided credentials are incorrect.'],
+                    'email' => [
+                        'The provided credentials are incorrect.'
+                    ],
                 ],
             ], 401);
         }
@@ -75,13 +82,15 @@ class AuthController extends Controller
         // Revoke old tokens before creating a new one.
         $user->tokens()->delete();
 
-        $token = $user->createToken('fsms-api-token')->plainTextToken;
+        $token = $user
+            ->createToken('fsms-api-token')
+            ->plainTextToken;
 
         return response()->json([
             'success' => true,
             'message' => 'Login successful.',
             'data' => [
-                'user' => $user,
+                'user' => new UserResource($user),
                 'token' => $token,
                 'token_type' => 'Bearer',
             ],
@@ -94,7 +103,9 @@ class AuthController extends Controller
      */
     public function logout(Request $request): JsonResponse
     {
-        $request->user()->currentAccessToken()?->delete();
+        $request->user()
+            ->currentAccessToken()
+            ?->delete();
 
         return response()->json([
             'success' => true,
@@ -109,11 +120,13 @@ class AuthController extends Controller
      */
     public function me(Request $request): JsonResponse
     {
+        $user = $request->user()->load('roles');
+
         return response()->json([
             'success' => true,
             'message' => 'Authenticated user.',
             'data' => [
-                'user' => $request->user(),
+                'user' => new UserResource($user),
             ],
             'errors' => null,
         ], 200);

@@ -125,29 +125,7 @@ const Login = () => {
         flexDirection: "column",
       }}
     >
-      {/* =========================
-          TOP BAR
-      ========================== */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          padding: "20px 32px",
-          color: "#f0e0c0",
-        }}
-      >
-        <span
-          style={{
-            fontSize: 15,
-            opacity: 0.9,
-          }}
-        >
-          Field Student Management System
-        </span>
-
-    
-      </div>
+     
 
       {/* =========================
           CENTER
@@ -192,9 +170,7 @@ const Login = () => {
                 color: "#222",
               }}
             >
-              {showRegister
-                ? "Create Account"
-                : "Field Student Management System"}
+             
             </h1>
 
             <p
@@ -204,9 +180,7 @@ const Login = () => {
                 marginBottom: 0,
               }}
             >
-              {showRegister
-                ? "Register your account to access the FSMS portal."
-                : "Field placements & student records for NSSF Trainee."}
+             
             </p>
           </div>
 
@@ -485,8 +459,7 @@ const Login = () => {
                 fontSize: 13,
               }}
             >
-              Access is limited to registered students
-              and staff.
+            
             </div>
           )}
         </div>
@@ -504,7 +477,7 @@ const Login = () => {
           opacity: 0.8,
         }}
       >
-        
+      
       </div>
     </div>
   );
