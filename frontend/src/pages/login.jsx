@@ -125,40 +125,7 @@ const Login = () => {
         flexDirection: "column",
       }}
     >
-      {/* =========================
-          TOP BAR
-      ========================== */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          padding: "20px 32px",
-          color: "#f0e0c0",
-        }}
-      >
-        <span
-          style={{
-            fontSize: 15,
-            opacity: 0.9,
-          }}
-        >
-          Field Student Management System
-        </span>
-
-        <span
-          style={{
-            border: "1px solid #f9b233",
-            color: "#f9b233",
-            borderRadius: 6,
-            padding: "4px 12px",
-            fontSize: 13,
-            fontWeight: 500,
-          }}
-        >
-          Production
-        </span>
-      </div>
+     
 
       {/* =========================
           CENTER
@@ -203,9 +170,7 @@ const Login = () => {
                 color: "#222",
               }}
             >
-              {showRegister
-                ? "Create Account"
-                : "FSMS Portal"}
+             
             </h1>
 
             <p
@@ -215,9 +180,7 @@ const Login = () => {
                 marginBottom: 0,
               }}
             >
-              {showRegister
-                ? "Register your account to access the FSMS portal."
-                : "Field placements & student records for NSSF Trainee."}
+             
             </p>
           </div>
 
@@ -496,8 +459,7 @@ const Login = () => {
                 fontSize: 13,
               }}
             >
-              Access is limited to registered students
-              and staff.
+            
             </div>
           )}
         </div>
@@ -515,8 +477,7 @@ const Login = () => {
           opacity: 0.8,
         }}
       >
-        Report a problem · System status · NSSF Computing
-        Faculty, 2026
+      
       </div>
     </div>
   );
