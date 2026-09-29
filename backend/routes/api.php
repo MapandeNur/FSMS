@@ -3,8 +3,13 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\StudentController;
+<<<<<<< Updated upstream
 use App\Http\Controllers\RoleController;
+=======
+use App\Http\Controllers\StudentDocumentController;
+>>>>>>> Stashed changes
 use Illuminate\Support\Facades\Route;
+
 
 Route::prefix('v1')->group(function () {
 
@@ -33,6 +38,25 @@ Route::prefix('v1')->group(function () {
         // Authentication
         Route::post('/auth/logout', [AuthController::class, 'logout']);
         Route::get('/auth/me', [AuthController::class, 'me']);
+        Route::post(
+            '/students/{student}/documents',
+            [StudentDocumentController::class, 'store']
+        );
+        
+        Route::get(
+            '/students/{student}/documents',
+            [StudentDocumentController::class, 'index']
+        );
+        
+        Route::get(
+            '/documents/{studentDocument}/download',
+            [StudentDocumentController::class, 'download']
+        );
+        
+        Route::delete(
+            '/documents/{studentDocument}',
+            [StudentDocumentController::class, 'destroy']
+        );
 
 
         /*
