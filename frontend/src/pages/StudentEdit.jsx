@@ -23,7 +23,7 @@ import {
 } from "@ant-design/icons";
 
 import { useNavigate, useParams } from "react-router-dom";
-import api from "../api/axios";
+import api from "../api/client";
 
 const { Title, Text } = Typography;
 
