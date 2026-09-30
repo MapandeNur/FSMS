@@ -15,7 +15,7 @@ import {
 } from "@ant-design/icons";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import api from "../api/axios";
+import api from "../api/client";
 
 
 const { Text } = Typography;
