@@ -4,11 +4,11 @@ namespace Tests\Feature;
 
 use App\Models\Role;
 use App\Models\Student;
+use App\Models\StudentDocument;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
 class StudentDocumentTest extends TestCase
@@ -19,12 +19,17 @@ class StudentDocumentTest extends TestCase
     {
         Storage::fake('private');
 
-        $admin = User::factory()->create([
+        $admin = User::create([
+            'name' => 'Test Admin',
+            'email' => 'admin-test@fsms.com',
+            'phone' => '0711111111',
+            'password' => 'Password123',
             'is_active' => true,
         ]);
 
-        $adminRole = Role::factory()->create([
+        $adminRole = Role::create([
             'name' => 'admin',
+            'description' => 'System administrator',
         ]);
 
         $admin->roles()->attach($adminRole->id, [
@@ -32,7 +37,21 @@ class StudentDocumentTest extends TestCase
             'end_date' => null,
         ]);
 
-        $student = Student::factory()->create([
+        $student = Student::create([
+            'registration_number' => 'TEST-STU-001',
+            'first_name' => 'Test',
+            'middle_name' => null,
+            'last_name' => 'Student',
+            'gender' => 'male',
+            'date_of_birth' => '2003-01-15',
+            'email' => 'student-test@fsms.com',
+            'phone' => '0722222222',
+            'institution_name' => 'Institute of Finance Management',
+            'programme_of_study' => 'Bachelor of Information Technology',
+            'year_of_study' => 2,
+            'start_date' => '2026-09-01',
+            'end_date' => '2026-11-01',
+            'status' => 'active',
             'created_by' => $admin->id,
         ]);
 
@@ -61,7 +80,7 @@ class StudentDocumentTest extends TestCase
             'uploaded_by' => $admin->id,
         ]);
 
-        $document = \App\Models\StudentDocument::first();
+        $document = StudentDocument::firstOrFail();
 
         Storage::disk('private')->assertExists(
             $document->stored_path
