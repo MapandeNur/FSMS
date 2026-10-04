@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\StudentDocumentController;
 use Illuminate\Support\Facades\Route;
 
@@ -37,7 +38,13 @@ Route::prefix('v1')->group(function () {
         Route::post('/auth/logout', [AuthController::class, 'logout']);
 
         Route::get('/auth/me', [AuthController::class, 'me']);
+           /*
+    |--------------------------------------------------------------------------
+    | Department Routes
+    |--------------------------------------------------------------------------
+    */
 
+    Route::apiResource('departments', DepartmentController::class);
 
         /*
         |--------------------------------------------------------------------------
