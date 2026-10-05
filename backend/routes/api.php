@@ -5,6 +5,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\RoleController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AttendanceController;
 
 Route::prefix('v1')->group(function () {
 
@@ -54,6 +55,13 @@ Route::prefix('v1')->group(function () {
     Route::apiResource('students', StudentController::class);
 });
 
-    });
+    
+       Route::middleware('role:student')->group(function () {
+            Route::post('/attendance/check-in', [AttendanceController::class, 'checkIn']);
+            Route::post('/attendance/check-out', [AttendanceController::class, 'checkOut']);
+            Route::get('/attendance/today', [AttendanceController::class, 'today']);
+            Route::get('/attendance/mine', [AttendanceController::class, 'mine']);
+        });
+    });    
 
 });
