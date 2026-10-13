@@ -47,6 +47,7 @@ class AttendanceTest extends TestCase
 
     public function test_successful_check_in(): void
     {
+        $this->travelTo(now()->startofDay()->setTime(7,0));
         [$user, $student] = $this->makeStudentUser();
 
         $response = $this->actingAs($user, 'sanctum')
