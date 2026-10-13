@@ -3,7 +3,9 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\StudentController;
-use App\Http\Controllers\RoleController;
+use App\Http\Controllers\DepartmentController;
+use App\Http\Controllers\PlacementController;
+use App\Http\Controllers\StudentDocumentController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\LogbookController;
@@ -15,14 +17,12 @@ Route::prefix('v1')->group(function () {
 
     /*
     |--------------------------------------------------------------------------
-    | Authentication Routes
+    | Public Authentication Routes
     |--------------------------------------------------------------------------
     */
 
-    // Public registration route
     Route::post('/auth/register', [AuthController::class, 'register']);
 
-    // Public login route
     Route::post('/auth/login', [AuthController::class, 'login'])
         ->middleware('throttle:5,1');
 
@@ -35,18 +35,49 @@ Route::prefix('v1')->group(function () {
 
     Route::middleware('auth:sanctum')->group(function () {
 
-        // Authentication
-        Route::post('/auth/logout', [AuthController::class, 'logout']);
-        Route::get('/auth/me', [AuthController::class, 'me']);
-        Route::middleware('role:supervisor')->group(function () {
-            Route::get('/supervisor/logbook', [SupervisorLogbookController::class, 'index']);
-            Route::post('/supervisor/logbook/{logbook}/approve', [SupervisorLogbookController::class, 'approve']);
-            Route::post('/supervisor/logbook/{logbook}/return', [SupervisorLogbookController::class, 'return']);
+        /*
+        |--------------------------------------------------------------------------
+        | Authentication Routes
+        |--------------------------------------------------------------------------
+        */
 
-            Route::get('/supervisor/leave-requests', [SupervisorLeaveController::class, 'index']);
-            Route::post('/supervisor/leave-requests/{leaveRequest}/approve', [SupervisorLeaveController::class, 'approve']);
-            Route::post('/supervisor/leave-requests/{leaveRequest}/reject', [SupervisorLeaveController::class, 'reject']);
-        });
+        Route::post('/auth/logout', [AuthController::class, 'logout']);
+
+        Route::get('/auth/me', [AuthController::class, 'me']);
+           /*
+    |--------------------------------------------------------------------------
+    | Department Routes
+    |--------------------------------------------------------------------------
+    */
+
+    Route::apiResource('departments', DepartmentController::class);
+    Route::apiResource('placements', PlacementController::class);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Student Document Routes
+        |--------------------------------------------------------------------------
+        */
+
+        Route::post(
+            '/students/{student}/documents',
+            [StudentDocumentController::class, 'store']
+        );
+
+        Route::get(
+            '/students/{student}/documents',
+            [StudentDocumentController::class, 'index']
+        );
+
+        Route::get(
+            '/documents/{studentDocument}/download',
+            [StudentDocumentController::class, 'download']
+        );
+
+        Route::delete(
+            '/documents/{studentDocument}',
+            [StudentDocumentController::class, 'destroy']
+        );
 
 
         /*
@@ -55,18 +86,13 @@ Route::prefix('v1')->group(function () {
         |--------------------------------------------------------------------------
         */
 
-       Route::middleware('role:admin')->group(function () {
+        Route::middleware('role:admin')->group(function () {
 
-    Route::get('/roles', [RoleController::class, 'index']);
-    Route::patch('/users/{user}/status', [UserController::class, 'updateStatus']);
+            Route::apiResource('users', UserController::class);
 
-    Route::apiResource('users', UserController::class);
+            Route::apiResource('students', StudentController::class);
 
-    Route::post('/users/{user}/roles', [UserController::class, 'assignRole']);
-    Route::delete('/users/{user}/roles/{role}', [UserController::class, 'removeRole']);
-
-    Route::apiResource('students', StudentController::class);
-});
+        });
 
     
        Route::middleware('role:student')->group(function () {

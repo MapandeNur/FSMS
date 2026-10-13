@@ -2,11 +2,11 @@
 
 namespace App\Models;
 
-use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
@@ -26,14 +26,38 @@ class User extends Authenticatable
         'remember_token',
     ];
 
-    /**
-     * The roles that belong to the user.
-     */
     public function roles(): BelongsToMany
     {
         return $this->belongsToMany(Role::class, 'role_user')
             ->withPivot('start_date', 'end_date')
             ->withTimestamps();
+    }
+
+    public function supervisedPlacements(): HasMany
+    {
+        return $this->hasMany(Placement::class, 'supervisor_id');
+    }
+
+    public function assignedPlacements(): HasMany
+    {
+        return $this->hasMany(Placement::class, 'assigned_by');
+    }
+
+    public function headedDepartments(): HasMany
+    {
+        return $this->hasMany(Department::class, 'head_user_id');
+    }
+
+    public function uploadedDocuments(): HasMany
+    {
+        return $this->hasMany(StudentDocument::class, 'uploaded_by');
+    }
+
+    public function hasRole(string $roleName): bool
+    {
+        return $this->roles()
+            ->where('name', $roleName)
+            ->exists();
     }
 
     protected function casts(): array
@@ -45,4 +69,3 @@ class User extends Authenticatable
         ];
     }
 }
-

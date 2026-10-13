@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Student extends Model
 {
@@ -27,7 +28,34 @@ class Student extends Model
         'end_date',
         'status',
         'created_by',
+        'user_id',
     ];
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function creator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function placements(): HasMany
+    {
+        return $this->hasMany(Placement::class, 'student_id');
+    }
+
+    public function activePlacement()
+    {
+        return $this->hasOne(Placement::class, 'student_id')
+            ->where('status', 'active');
+    }
+
+    public function documents(): HasMany
+    {
+        return $this->hasMany(StudentDocument::class, 'student_id');
+    }
 
     protected function casts(): array
     {
@@ -37,10 +65,5 @@ class Student extends Model
             'end_date' => 'date',
             'year_of_study' => 'integer',
         ];
-    }
-
-    public function creator(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'created_by');
     }
 }
