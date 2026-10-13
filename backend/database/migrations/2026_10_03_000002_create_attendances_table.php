@@ -16,7 +16,7 @@ return new class extends Migration
             $table->date('attendance_date');
             $table->dateTime('check_in_at')->nullable();
             $table->dateTime('check_out_at')->nullable();
-            $table->enum('status', ['present', 'late'])->nullable();
+            $table->enum('status', ['present', 'late', 'excused'])->nullable();
             $table->enum('source', ['self', 'supervisor', 'system'])->default('self');
             $table->foreignId('recorded_by')->nullable()->constrained('users')->nullOnDelete();
             $table->text('remarks')->nullable();
