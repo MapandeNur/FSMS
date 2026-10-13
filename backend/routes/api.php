@@ -7,6 +7,11 @@ use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\PlacementController;
 use App\Http\Controllers\StudentDocumentController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\LogbookController;
+use App\Http\Controllers\SupervisorLogbookController;
+use App\Http\Controllers\LeaveRequestController;
+use App\Http\Controllers\SupervisorLeaveController;
 
 Route::prefix('v1')->group(function () {
 
@@ -89,6 +94,21 @@ Route::prefix('v1')->group(function () {
 
         });
 
-    });
+    
+       Route::middleware('role:student')->group(function () {
+            Route::post('/attendance/check-in', [AttendanceController::class, 'checkIn']);
+            Route::post('/attendance/check-out', [AttendanceController::class, 'checkOut']);
+            Route::get('/attendance/today', [AttendanceController::class, 'today']);
+            Route::get('/attendance/mine', [AttendanceController::class, 'mine']);
+            Route::get('/logbook', [LogbookController::class, 'index']);
+            Route::post('/logbook', [LogbookController::class, 'store']);
+            Route::put('/logbook/{logbook}', [LogbookController::class, 'update']);
+            Route::post('/logbook/{logbook}/submit', [LogbookController::class, 'submit']);
+
+            Route::get('/leave-requests', [LeaveRequestController::class, 'index']);
+            Route::post('/leave-requests', [LeaveRequestController::class, 'store']);
+            Route::delete('/leave-requests/{leaveRequest}', [LeaveRequestController::class, 'destroy']);
+        });
+    });    
 
 });

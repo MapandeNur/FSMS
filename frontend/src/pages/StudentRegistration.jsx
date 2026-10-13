@@ -20,7 +20,7 @@ import {
 } from "@ant-design/icons";
 
 import { useNavigate } from "react-router-dom";
-import api from "../api/axios";
+import api from "../api/client";
 
 const { Title, Text } = Typography;
 
@@ -75,7 +75,7 @@ const StudentRegistration = () => {
         status: values.status,
       };
 
-      console.log("STUDENT PAYLOAD:", payload);
+     
 
       const response = await api.post(
         "/v1/students",
