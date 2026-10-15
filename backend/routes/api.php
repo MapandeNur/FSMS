@@ -30,7 +30,12 @@ Route::prefix('v1')->group(function () {
 
         // Departments and placements
         Route::apiResource('departments', DepartmentController::class);
-        Route::apiResource('placements', PlacementController::class);
+                Route::middleware('role:admin,hr_officer')->group(function () {
+            Route::get('/students/{student}/placements', [PlacementController::class, 'index']);
+            Route::post('/students/{student}/placements', [PlacementController::class, 'store']);
+            Route::patch('/placements/{placement}/end', [PlacementController::class, 'end']);
+            Route::post('/placements/{placement}/transfer', [PlacementController::class, 'transfer']);
+        });
 
         // Student documents
         Route::post('/students/{student}/documents', [StudentDocumentController::class, 'store']);
