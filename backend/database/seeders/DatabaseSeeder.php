@@ -12,6 +12,7 @@ class DatabaseSeeder extends Seeder
             RoleSeeder::class,
             AdminUserSeeder::class,
             DepartmentSeeder::class,
+            HolidaySeeder::class,
         ]);
     }
 }
