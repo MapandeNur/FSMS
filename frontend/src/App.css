@@ -1,184 +1,172 @@
-.counter {
-  font-size: 16px;
-  padding: 5px 10px;
-  border-radius: 5px;
-  color: var(--accent);
-  background: var(--accent-bg);
-  border: 2px solid transparent;
-  transition: border-color 0.3s;
-  margin-bottom: 24px;
-
-  &:hover {
-    border-color: var(--accent-border);
+/* ========================================
+FSMS - Field Student Management System
+Main application styles
+======================================== */
+:root {
+  --fsms-primary: #6e1423;
+  --fsms-primary-hover: #8d2638;
+  --fsms-accent: #f9b233;
+  --fsms-accent-hover: #e6a020;
+  --fsms-background: #f5f6fa;
+  --fsms-surface: #ffffff;
+  --fsms-text: #292929;
+  --fsms-muted: #8c8c8c;
+  --fsms-border: #e5e7eb;
+  --fsms-radius: 10px;
+  --fsms-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
   }
-  &:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 2px;
+  /* General application styles */
+  *{
+  box-sizing: border-box;
   }
-}
-
-.hero {
-  position: relative;
-
-  .base,
-  .framework,
-  .vite {
-    inset-inline: 0;
-    margin: 0 auto;
+  html {
+  min-width: 320px;
+  min-height: 100%;
   }
-
-  .base {
-    width: 170px;
-    position: relative;
-    z-index: 0;
+  body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background: var(--fsms-background);
+  color: var(--fsms-text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+  Arial, sans-serif;
   }
-
-  .framework,
-  .vite {
-    position: absolute;
-  }
-
-  .framework {
-    z-index: 1;
-    top: 34px;
-    height: 28px;
-    transform: perspective(2000px) rotateZ(300deg) rotateX(44deg) rotateY(39deg)
-      scale(1.4);
-  }
-
-  .vite {
-    z-index: 0;
-    top: 107px;
-    height: 26px;
-    width: auto;
-    transform: perspective(2000px) rotateZ(300deg) rotateX(40deg) rotateY(39deg)
-      scale(0.8);
-  }
-}
-
-#center {
-  display: flex;
-  flex-direction: column;
-  gap: 25px;
-  place-content: center;
-  place-items: center;
-  flex-grow: 1;
-
-  @media (max-width: 1024px) {
-    padding: 32px 20px 24px;
-    gap: 18px;
-  }
-}
-
-#next-steps {
-  display: flex;
-  border-top: 1px solid var(--border);
-  text-align: left;
-
-  & > div {
-    flex: 1 1 0;
-    padding: 32px;
-    @media (max-width: 1024px) {
-      padding: 24px 20px;
-    }
-  }
-
-  .icon {
-    margin-bottom: 16px;
-    width: 22px;
-    height: 22px;
-  }
-
-  @media (max-width: 1024px) {
-    flex-direction: column;
-    text-align: center;
-  }
-}
-
-#docs {
-  border-right: 1px solid var(--border);
-
-  @media (max-width: 1024px) {
-    border-right: none;
-    border-bottom: 1px solid var(--border);
-  }
-}
-
-#next-steps ul {
-  list-style: none;
-  padding: 0;
-  display: flex;
-  gap: 8px;
-  margin: 32px 0 0;
-
-  .logo {
-    height: 18px;
-  }
-
-  a {
-    color: var(--text-h);
-    font-size: 16px;
-    border-radius: 6px;
-    background: var(--social-bg);
-    display: flex;
-    padding: 6px 12px;
-    align-items: center;
-    gap: 8px;
-    text-decoration: none;
-    transition: box-shadow 0.3s;
-
-    &:hover {
-      box-shadow: var(--shadow);
-    }
-    .button-icon {
-      height: 18px;
-      width: 18px;
-    }
-  }
-
-  @media (max-width: 1024px) {
-    margin-top: 20px;
-    flex-wrap: wrap;
-    justify-content: center;
-
-    li {
-      flex: 1 1 calc(50% - 8px);
-    }
-
-    a {
-      width: 100%;
-      justify-content: center;
-      box-sizing: border-box;
-    }
-  }
-}
-
-#spacer {
-  height: 88px;
-  border-top: 1px solid var(--border);
-  @media (max-width: 1024px) {
-    height: 48px;
-  }
-}
-
-.ticks {
-  position: relative;
+  #root {
+  min-height: 100vh;
   width: 100%;
-
-  &::before,
-  &::after {
-    content: '';
-    position: absolute;
-    top: -4.5px;
-    border: 5px solid transparent;
   }
-
-  &::before {
-    left: 0;
-    border-left-color: var(--border);
+  button,
+  input,
+  select,
+  textarea {
+  font: inherit;
   }
-  &::after {
-    right: 0;
-    border-right-color: var(--border);
+  button {
+  cursor: pointer;
   }
-}
+  a {
+  color: var(--fsms-primary);
+  text-decoration: none;
+  }
+  a:hover {
+  color: var(--fsms-primary-hover);
+  }
+  /* Main page containers */
+  .page-container {
+  width: 100%;
+  padding: 24px;
+  }
+  .page-card {
+  width: 100%;
+  min-height: 300px;
+  padding: 24px;
+  background: var(--fsms-surface);
+  border-radius: 14px;
+  box-shadow: var(--fsms-shadow);
+  }
+  .placeholder-page {
+  min-height: 400px;
+  padding: 40px;
+  background: var(--fsms-surface);
+  border-radius: 14px;
+  box-shadow: var(--fsms-shadow);
+  }
+  .placeholder-page h1 {
+  color: var(--fsms-primary);
+  }
+  .placeholder-page p {
+  color: var(--fsms-muted);
+  line-height: 1.6;
+  }
+  /* Forms */
+  .form-container {
+  width: 100%;
+  max-width: 650px;
+  margin: 0 auto;
+  }
+  .form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 24px;
+  }
+  /* Tables */
+  .table-container {
+  width: 100%;
+  overflow-x: auto;
+  }
+  /* Buttons */
+  .fsms-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 10px 18px;
+  color: #292929;
+  background: var(--fsms-accent);
+  border: 1px solid var(--fsms-accent);
+  border-radius: var(--fsms-radius);
+  font-weight: 600;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+  }
+  .fsms-button:hover {
+  background: var(--fsms-accent-hover);
+  border-color: var(--fsms-accent-hover);
+  }
+  .fsms-button:focus-visible {
+  outline: 2px solid var(--fsms-primary);
+  outline-offset: 3px;
+  }
+  /* Status labels */
+  .status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  }
+  .status-badge-active {
+  color: #237804;
+  background: #f6ffed;
+  }
+  .status-badge-pending {
+  color: #ad6800;
+  background: #fffbe6;
+  }
+  .status-badge-inactive {
+  color: #cf1322;
+  background: #fff1f0;
+  }
+  /* Responsive layout */
+  @media (max-width: 768px) {
+  .page-container {
+  padding: 14px;
+  }
+  .page-card {
+  padding: 16px;
+  }
+  .placeholder-page {
+  min-height: 300px;
+  padding: 24px;
+  }
+  .form-actions {
+  flex-direction: column;
+  }
+  .form-actions button {
+  width: 100%;
+  }
+  }
+  @media (max-width: 480px) {
+  .page-container {
+  padding: 10px;
+  }
+  .page-card {
+  padding: 12px;
+  }
+  .placeholder-page {
+  padding: 18px;
+  }
+  }

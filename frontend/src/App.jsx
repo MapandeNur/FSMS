@@ -1,10 +1,4 @@
-import React from "react";
-import {
-  BrowserRouter,
-  Routes,
-  Route,
-  Navigate,
-} from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { ConfigProvider } from "antd";
 
 import MainLayout from "./component/Layout/MainLayout";
@@ -16,25 +10,21 @@ import Students from "./pages/Students";
 import StudentRegistration from "./pages/StudentRegistration";
 import StudentDetails from "./pages/StudentDetails";
 import StudentEdit from "./pages/StudentEdit";
-
-const PlaceholderPage = ({ title, description }) => {
-  return (
-    <div
-      style={{
-        background: "#fff",
-        borderRadius: 14,
-        padding: 40,
-        minHeight: 400,
-      }}
-    >
-      <h1 style={{ color: "#6e1423" }}>{title}</h1>
-
-      <p style={{ color: "#8c8c8c" }}>
-        {description}
-      </p>
-    </div>
-  );
-};
+import Departments from "./pages/Departments";
+import Placements from "./pages/Placements";
+const PlaceholderPage = ({ title, description }) => (
+  <div
+    style={{
+      background: "#fff",
+      borderRadius: 14,
+      padding: 40,
+      minHeight: 400,
+    }}
+  >
+    <h1 style={{ color: "#6e1423" }}>{title}</h1>
+    <p style={{ color: "#8c8c8c" }}>{description}</p>
+  </div>
+);
 
 function App() {
   return (
@@ -48,197 +38,126 @@ function App() {
         },
       }}
     >
-      <BrowserRouter>
-        <Routes>
+      <Routes>
+        <Route path="/login" element={<Login />} />
 
-          {/* =========================
-              PUBLIC ROUTES
-          ========================= */}
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <MainLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<Navigate to="/dashboard" replace />} />
+
+          <Route path="dashboard" element={<Dashboard />} />
 
           <Route
-            path="/login"
-            element={<Login />}
-          />
-
-          {/* =========================
-              PROTECTED APPLICATION
-          ========================= */}
-
-          <Route
-            path="/"
+            path="students"
             element={
-              <ProtectedRoute>
-                <MainLayout />
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <Students />
               </ProtectedRoute>
             }
-          >
-            {/* =========================
-                ROOT → DASHBOARD
-            ========================= */}
-
-            <Route
-              index
-              element={
-                <Navigate
-                  to="/dashboard"
-                  replace
-                />
-              }
-            />
-
-            {/* =========================
-                DASHBOARD
-                All authenticated users
-            ========================= */}
-
-            <Route
-              path="dashboard"
-              element={<Dashboard />}
-            />
-
-            {/* =========================
-                STUDENTS
-                ADMIN ONLY
-            ========================= */}
-
-            <Route
-              path="students"
-              element={
-                <ProtectedRoute allowedRoles={["admin"]}>
-                  <Students />
-                </ProtectedRoute>
-              }
-            />
-
-            <Route
-              path="students/register"
-              element={
-                <ProtectedRoute allowedRoles={["admin"]}>
-                  <StudentRegistration />
-                </ProtectedRoute>
-              }
-            />
-
-            <Route
-              path="students/:id"
-              element={
-                <ProtectedRoute allowedRoles={["admin"]}>
-                  <StudentDetails />
-                </ProtectedRoute>
-              }
-            />
-
-            <Route
-              path="students/:id/edit"
-              element={
-                <ProtectedRoute allowedRoles={["admin"]}>
-                  <StudentEdit />
-                </ProtectedRoute>
-              }
-            />
-
-            {/* =========================
-                FIELD PLACEMENTS
-                ADMIN ONLY FOR NOW
-            ========================= */}
-
-            <Route
-              path="placements"
-              element={
-                <ProtectedRoute allowedRoles={["admin"]}>
-                  <PlaceholderPage
-                    title="Field Placements"
-                    description="Field placement management module will be available here."
-                  />
-                </ProtectedRoute>
-              }
-            />
-
-            {/* =========================
-                REPORTS
-                ADMIN ONLY FOR NOW
-            ========================= */}
-
-            <Route
-              path="reports"
-              element={
-                <ProtectedRoute allowedRoles={["admin"]}>
-                  <PlaceholderPage
-                    title="Reports"
-                    description="Reports module will be available here."
-                  />
-                </ProtectedRoute>
-              }
-            />
-
-            {/* =========================
-                USERS
-                ADMIN ONLY
-            ========================= */}
-
-            <Route
-              path="users"
-              element={
-                <ProtectedRoute allowedRoles={["admin"]}>
-                  <PlaceholderPage
-                    title="Users"
-                    description="User management module will be available here."
-                  />
-                </ProtectedRoute>
-              }
-            />
-
-            {/* =========================
-                ROLES
-                ADMIN ONLY
-            ========================= */}
-
-            <Route
-              path="roles"
-              element={
-                <ProtectedRoute allowedRoles={["admin"]}>
-                  <PlaceholderPage
-                    title="Roles & Permissions"
-                    description="Roles and permissions module will be available here."
-                  />
-                </ProtectedRoute>
-              }
-            />
-
-            {/* =========================
-                SETTINGS
-                ADMIN ONLY
-            ========================= */}
-
-            <Route
-              path="settings"
-              element={
-                <ProtectedRoute allowedRoles={["admin"]}>
-                  <PlaceholderPage
-                    title="Settings"
-                    description="System settings will be available here."
-                  />
-                </ProtectedRoute>
-              }
-            />
-          </Route>
-
-          {/* =========================
-              UNKNOWN ROUTES
-          ========================= */}
+          />
 
           <Route
-            path="*"
+            path="students/register"
             element={
-              <Navigate
-                to="/dashboard"
-                replace
-              />
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <StudentRegistration />
+              </ProtectedRoute>
             }
           />
 
-        </Routes>
-      </BrowserRouter>
+          <Route
+            path="students/:id/edit"
+            element={
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <StudentEdit />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="students/:id"
+            element={
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <StudentDetails />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="departments"
+            element={
+              <ProtectedRoute allowedRoles={["admin", "hr_officer"]}>
+                <Departments />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="placements"
+            element={
+              <ProtectedRoute allowedRoles={["admin", "hr_officer"]}>
+                <Placements />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="reports"
+            element={
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <PlaceholderPage
+                  title="Reports"
+                  description="Reports module will be available here."
+                />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="users"
+            element={
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <PlaceholderPage
+                  title="Users"
+                  description="User management module will be available here."
+                />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="roles"
+            element={
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <PlaceholderPage
+                  title="Roles & Permissions"
+                  description="Roles and permissions module will be available here."
+                />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="settings"
+            element={
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <PlaceholderPage
+                  title="Settings"
+                  description="System settings will be available here."
+                />
+              </ProtectedRoute>
+            }
+          />
+        </Route>
+
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      </Routes>
     </ConfigProvider>
   );
 }
