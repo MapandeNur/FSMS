@@ -10,7 +10,7 @@ import Students from "./pages/Students";
 import StudentRegistration from "./pages/StudentRegistration";
 import StudentDetails from "./pages/StudentDetails";
 import StudentEdit from "./pages/StudentEdit";
-import Departments from "./pages/Departments";
+import Departments from "./pages/Departments.jsx";
 import Placements from "./pages/Placements";
 const PlaceholderPage = ({ title, description }) => (
   <div
