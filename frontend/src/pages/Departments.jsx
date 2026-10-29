@@ -5,7 +5,7 @@ import api from "../api/client";
 const { Title } = Typography;
 
 export default function Departments() {
-Updated upstream;
+
 const [departments, setDepartments] = useState([]);
 const [loading, setLoading] = useState(true);
 const [error, setError] = useState("");
@@ -92,9 +92,6 @@ return (
 </Card>
 
 );
-  const [departments, setDepartments] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
 
   useEffect(() => {
     let active = true;
