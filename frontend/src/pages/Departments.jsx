@@ -134,34 +134,6 @@ return (
     };
   }, []);
 
-  const columns = [
-    {
-      title: "Department",
-      dataIndex: "name",
-      key: "name",
-    },
-    {
-      title: "Code",
-      dataIndex: "code",
-      key: "code",
-    },
-    {
-      title: "Description",
-      dataIndex: "description",
-      key: "description",
-      render: (value) => value || "—",
-    },
-    {
-      title: "Status",
-      dataIndex: "is_active",
-      key: "is_active",
-      render: (value) => (
-        <Tag color={value ? "green" : "red"}>
-          {value ? "Active" : "Inactive"}
-        </Tag>
-      ),
-    },
-  ];
 
   return (
     <Card>
