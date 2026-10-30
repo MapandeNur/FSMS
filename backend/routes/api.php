@@ -160,6 +160,7 @@ Route::prefix('v1')->group(function () {
             );
 
         });
+        Route::get('/placements', [PlacementController::class, 'index']);
 
 
         /*
@@ -189,9 +190,7 @@ Route::prefix('v1')->group(function () {
             // Supervisor logbook
             Route::post(
                 '/logbook/{entryId}/return',
-                [SupervisorLogbookController::class, 'return']
-            );
-
+                [SupervisorLogbookController::class, 'return']);
         });
 
     });

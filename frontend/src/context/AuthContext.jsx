@@ -88,8 +88,8 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const response = await api.post(
-        "/v1/auth/login",
+      const response = api.post(
+        "/auth/login",
         {
           email,
           password,
@@ -160,8 +160,8 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     try {
       if (token) {
-        await api.post(
-          "/v1/auth/logout"
+       api.post(
+          "/auth/logout"
         );
       }
     } catch (error) {
